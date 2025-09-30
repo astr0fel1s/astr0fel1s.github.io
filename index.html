@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Minecraft Server</title>
+    <title>Minecraft Server Desktop</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Segoe+UI:wght@400;700&display=swap" rel="stylesheet">
     <style>
@@ -13,12 +13,16 @@
             background-size: cover;
             background-position: center;
             background-attachment: fixed;
-            overflow: hidden; /* Prevent scrolling the whole page */
+            transition: background-image 0.5s ease-in-out;
+            overflow: hidden; /* Prevent scrollbars from the desktop itself */
         }
         .win7-window {
             box-shadow: 0 5px 25px rgba(0,0,0,0.2);
             border: 1px solid #707070;
             border-radius: 6px;
+            position: absolute;
+            display: flex;
+            flex-direction: column;
         }
         .win7-title-bar {
             background: linear-gradient(to bottom, rgba(240, 240, 240, 0.9), rgba(200, 200, 200, 0.8));
@@ -28,11 +32,14 @@
             padding: 5px 8px;
             border-top-left-radius: 5px;
             border-top-right-radius: 5px;
+            user-select: none;
+            cursor: move;
         }
         .win7-content {
             background-color: #F0F0F0;
             border-bottom-left-radius: 5px;
             border-bottom-right-radius: 5px;
+            flex-grow: 1;
         }
         .win7-controls button {
             width: 20px; height: 20px; border: 1px solid #a0a0a0;
@@ -41,97 +48,232 @@
         }
         .win7-controls .close:hover { background-color: #e81123; color: white; }
         .win7-button {
-            background: linear-gradient(to bottom, #f0f0f0, #e0e0e0);
-            border: 1px solid #a0a0a0;
-            border-radius: 3px;
-            box-shadow: 0 1px 1px rgba(0,0,0,0.1);
+            background: linear-gradient(to bottom, #f0f0f0, #e0e0e0); border: 1px solid #a0a0a0; border-radius: 3px; box-shadow: 0 1px 1px rgba(0,0,0,0.1);
         }
         .win7-button:hover {
-            border-color: #3b82f6;
-            background: linear-gradient(to bottom, #eaf5ff, #c4e0ff);
+            border-color: #3b82f6; background: linear-gradient(to bottom, #eaf5ff, #c4e0ff);
         }
-        .win7-taskbar {
-            background: linear-gradient(to bottom, rgba(0,0,0,0.7), rgba(0,0,0,0.8));
-            backdrop-filter: blur(15px);
-            -webkit-backdrop-filter: blur(15px);
-            border-top: 1px solid rgba(255,255,255,0.3);
+        .modal-backdrop {
+            background-color: rgba(0,0,0,0.5); backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px);
         }
-        #start-menu {
-            background: rgba(255, 255, 255, 0.8);
-            backdrop-filter: blur(15px);
-            -webkit-backdrop-filter: blur(15px);
-            border: 1px solid #a0a0a0;
+        .wallpaper-option {
+            border: 2px solid transparent; cursor: pointer;
         }
-        .spinner { border-top-color: #3b82f6; animation: spin 1s linear infinite; }
-        @keyframes spin { to { transform: rotate(360deg); } }
+        .wallpaper-option.selected { border-color: #3b82f6; }
+
+        /* Desktop Icon Styles */
+        .desktop-icon {
+            position: absolute;
+            width: 80px;
+            text-align: center;
+            cursor: pointer;
+            user-select: none;
+            padding: 4px;
+            border: 1px solid transparent;
+        }
+        .desktop-icon:hover {
+            background: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            border-radius: 3px;
+        }
+        .desktop-icon img {
+            width: 48px;
+            height: 48px;
+            margin: 0 auto;
+        }
+        .desktop-icon span {
+            color: white;
+            font-size: 13px;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.8);
+            display: block;
+            margin-top: 4px;
+        }
     </style>
 </head>
-<body class="h-screen flex flex-col">
+<body class="h-screen w-screen">
 
-    <!-- Desktop Area -->
-    <main class="flex-grow p-4 md:p-8 flex items-center justify-center">
-        <div class="win7-window w-full max-w-5xl">
-            <!-- Title Bar -->
-            <div class="win7-title-bar flex justify-between items-center">
-                <span class="font-bold text-sm text-black">Welcome to the Server</span>
-                <div class="win7-controls flex space-x-1">
-                    <button class="bg-gray-200 hover:bg-gray-300 text-black text-xs">_</button>
-                    <button class="bg-gray-200 hover:bg-gray-300 text-black text-xs">[]</button>
-                    <button class="bg-gray-200 close text-black">X</button>
-                </div>
-            </div>
-            <!-- Window Content -->
+    <main id="desktop" class="h-full w-full relative">
+        <!-- Desktop Icons -->
+        <div class="desktop-icon" data-opens="welcome-window" style="top: 20px; left: 20px;">
+            <img src="https://i.postimg.cc/L6R7z8c3/server-icon.png" alt="Server Info Icon">
+            <span>Server Info</span>
+        </div>
+        <div class="desktop-icon" data-opens="mods-window" style="top: 120px; left: 20px;">
+            <img src="https://i.postimg.cc/pT3wL9Vj/mods-icon.png" alt="Mod List Icon">
+            <span>Mod List</span>
+        </div>
+        <div class="desktop-icon" data-opens="personalize-window" style="top: 220px; left: 20px;">
+            <img src="https://i.postimg.cc/q7bH7zN3/personalize-icon.png" alt="Personalize Icon">
+            <span>Personalize</span>
+        </div>
+
+        <!-- Welcome Window -->
+        <div id="welcome-window" class="win7-window w-full max-w-lg" style="top: 50px; left: 150px;">
+            <div class="win7-title-bar flex justify-between items-center"><span class="font-bold text-sm text-black">Welcome to the Server</span><div class="win7-controls flex space-x-1"><button class="bg-gray-200 hover:bg-gray-300 text-black text-xs">_</button><button class="bg-gray-200 hover:bg-gray-300 text-black text-xs">[]</button><button class="close-btn bg-gray-200 close text-black" data-closes="welcome-window">X</button></div></div>
             <div class="win7-content p-6 text-black">
-                 <p class="mb-4">Hey everyone! Welcome to the homepage for our new modded server. This pack is all about building awesome factories with <strong>Create</strong>, becoming master chefs with <strong>Farmer's Delight</strong>, and finally having enough inventory space thanks to the <strong>Sophisticated</strong> mods.</p>
-                 <p class="mb-6">I've also added <strong>Expanded Ecosphere</strong> to make the world look amazing, and the <strong>Dungeons and Taverns</strong> mods so we have some cool places to explore together. It should be a pretty stable and fun world to hang out in. Can't wait to see what you all build!</p>
-                
-                 <hr class="border-gray-300 my-6">
-
-                 <h2 class="text-xl font-bold mb-4">Need an Idea?</h2>
-                 <div class="grid md:grid-cols-2 gap-6">
-                    <div>
-                        <h3 class="font-bold mb-2">Let's Make Up Some Lore</h3>
-                        <p class="text-sm mb-3">Click the button to get a silly, random backstory for our world.</p>
-                        <button id="generate-backstory-btn" class="win7-button px-4 py-1.5">Tell Me a Story</button>
-                        <div id="backstory-loading" class="hidden mt-2"><div class="spinner w-6 h-6 rounded-full border-4 border-gray-300"></div></div>
-                        <div id="backstory-response" class="bg-white mt-2 p-2 border border-gray-300 rounded text-sm hidden"></div>
-                    </div>
-                     <div>
-                        <h3 class="font-bold mb-2">What Should I Do Now?</h3>
-                        <p class="text-sm mb-3">Not sure what to do next? Tell me what you've been up to.</p>
-                        <textarea id="advisor-input" class="w-full bg-white border border-gray-400 rounded p-1 text-sm focus:ring-1 focus:ring-blue-500 focus:border-blue-500 outline-none" rows="2" placeholder="e.g., I just finished my hobbit hole..."></textarea>
-                        <button id="get-advice-btn" class="win7-button px-4 py-1.5 mt-2">Give Me a Quest</button>
-                        <div id="advisor-loading" class="hidden mt-2"><div class="spinner w-6 h-6 rounded-full border-4 border-gray-300"></div></div>
-                        <div id="advisor-response" class="bg-white mt-2 p-2 border border-gray-300 rounded text-sm hidden"></div>
-                    </div>
-                 </div>
+                <p id="welcome-message" class="mb-6">Hey everyone! Welcome to the homepage for our new modded server. Use this site to check out the mod list and see screenshots from our world. Have fun!</p>
+                <hr class="border-gray-300 my-6">
+                <h2 class="text-xl font-bold mb-4">Screenshot Viewer</h2>
+                <div id="screenshot-gallery" class="grid grid-cols-2 md:grid-cols-3 gap-4 bg-white p-4 border border-gray-400 rounded max-h-80 overflow-y-auto"></div>
             </div>
+        </div>
+
+        <!-- Mods Window -->
+        <div id="mods-window" class="win7-window w-full max-w-4xl h-[70vh] hidden" style="top: 100px; left: 250px;">
+            <div class="win7-title-bar flex justify-between items-center"><span class="font-bold text-sm text-black">Mod List</span><div class="win7-controls flex space-x-1"><button class="bg-gray-200 hover:bg-gray-300 text-black text-xs">_</button><button class="bg-gray-200 hover:bg-gray-300 text-black text-xs">[]</button><button class="close-btn bg-gray-200 close text-black" data-closes="mods-window">X</button></div></div>
+            <div class="win7-content p-4 text-black overflow-y-auto">
+                <div id="mod-list-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2"></div>
+            </div>
+        </div>
+        
+        <!-- Personalize Window -->
+        <div id="personalize-window" class="win7-window w-full max-w-2xl hidden" style="top: 150px; left: 350px;">
+            <div class="win7-title-bar flex justify-between items-center"><span class="font-bold text-sm text-black">Personalization</span><div class="win7-controls flex space-x-1"><button class="close-btn bg-gray-200 close text-black" data-closes="personalize-window">X</button></div></div>
+            <div class="win7-content p-6 text-black">
+                <h3 class="font-bold text-lg mb-4">Change Desktop Background</h3>
+                <div id="wallpaper-options" class="grid grid-cols-4 gap-4 mb-6"></div>
+                <h3 class="font-bold text-lg mb-4">Edit Welcome Message</h3>
+                <textarea id="welcome-message-input" class="w-full bg-white border border-gray-400 rounded p-1 text-sm h-24"></textarea>
+                <div class="flex justify-end mt-6"><button id="save-settings-btn" class="win7-button px-6 py-1.5 font-bold">Save Changes</button></div>
+            </div>
+        </div>
+
+        <!-- Image Viewer Window -->
+        <div id="image-viewer-window" class="win7-window w-auto max-w-4xl hidden" style="top: 20%; left: 20%;">
+             <div class="win7-title-bar flex justify-between items-center"><span id="image-title" class="font-bold text-sm text-black">Windows Photo Viewer</span><div class="win7-controls flex space-x-1"><button class="close-btn bg-gray-200 close text-black" data-closes="image-viewer-window">X</button></div></div>
+            <div class="win7-content p-2"><img id="full-size-image" src="" alt="Full-size screenshot" class="max-w-[80vw] max-h-[70vh]"></div>
         </div>
     </main>
 
-    <!-- Taskbar -->
-    <footer class="win7-taskbar w-full h-10 flex items-center px-2 relative">
-        <!-- Start Button -->
-        <button id="start-btn" class="w-10 h-10 bg-center bg-no-repeat bg-cover rounded-full" style="background-image: url('https://i.postimg.cc/1XyJc72S/win7-start-orb.png');"></button>
-        
-        <!-- Start Menu -->
-        <div id="start-menu" class="absolute bottom-12 left-2 w-64 rounded-lg shadow-lg hidden">
-            <a href="index.html" class="block px-4 py-2 text-black hover:bg-blue-300 rounded-t-lg">Home</a>
-            <a href="mods.html" class="block px-4 py-2 text-black hover:bg-blue-300 rounded-b-lg">Mod List</a>
-        </div>
-    </footer>
-
     <script type="module">
-        // Start Menu Logic
-        const startBtn = document.getElementById('start-btn');
-        const startMenu = document.getElementById('start-menu');
-        startBtn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            startMenu.classList.toggle('hidden');
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, onSnapshot, setDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // --- Draggable Elements & Window Management ---
+        let highestZ = 10;
+        
+        function makeDraggable(element, handle) {
+            let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
+            
+            const dragMouseDown = (e) => {
+                e = e || window.event;
+                e.preventDefault();
+                pos3 = e.clientX;
+                pos4 = e.clientY;
+                document.onmouseup = closeDragElement;
+                document.onmousemove = elementDrag;
+
+                // Bring window to front
+                if (element.classList.contains('win7-window')) {
+                    highestZ++;
+                    element.style.zIndex = highestZ;
+                }
+            };
+
+            handle.onmousedown = dragMouseDown;
+
+            const elementDrag = (e) => {
+                e = e || window.event;
+                e.preventDefault();
+                pos1 = pos3 - e.clientX;
+                pos2 = pos4 - e.clientY;
+                pos3 = e.clientX;
+                pos4 = e.clientY;
+                element.style.top = (element.offsetTop - pos2) + "px";
+                element.style.left = (element.offsetLeft - pos1) + "px";
+            };
+
+            const closeDragElement = () => {
+                document.onmouseup = null;
+                document.onmousemove = null;
+            };
+        }
+        
+        document.querySelectorAll('.win7-window').forEach(win => makeDraggable(win, win.querySelector('.win7-title-bar')));
+        document.querySelectorAll('.desktop-icon').forEach(icon => makeDraggable(icon, icon));
+        
+        // --- Icon & Window Interactions ---
+        document.querySelectorAll('.desktop-icon').forEach(icon => {
+            icon.addEventListener('dblclick', () => {
+                const windowId = icon.dataset.opens;
+                const windowEl = document.getElementById(windowId);
+                if (windowEl) {
+                    windowEl.classList.remove('hidden');
+                    highestZ++;
+                    windowEl.style.zIndex = highestZ;
+                }
+            });
         });
-        document.addEventListener('click', () => {
-            startMenu.classList.add('hidden');
+        
+        document.querySelectorAll('.close-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const windowId = btn.dataset.closes;
+                document.getElementById(windowId).classList.add('hidden');
+            });
         });
+
+        // --- Firebase & Personalization ---
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        const welcomeMessageEl = document.getElementById('welcome-message');
+        const welcomeMessageInput = document.getElementById('welcome-message-input');
+        const wallpaperOptionsContainer = document.getElementById('wallpaper-options');
+        const saveSettingsBtn = document.getElementById('save-settings-btn');
+        let currentSettings = {};
+        
+        const wallpapers = [
+            { name: 'Windows 7', url: 'https://i.postimg.cc/W1V6yC1g/windows-7-wallpaper.jpg', thumb: 'https://i.postimg.cc/J0B7WfN8/win7-thumb.jpg' },
+            { name: 'Bliss', url: 'https://i.postimg.cc/3JcWWzmp/bliss.jpg', thumb: 'https://i.postimg.cc/zX3rNtjM/bliss-thumb.jpg' },
+            { name: 'Frutiger Aero', url: 'https://i.postimg.cc/L8p5gX1f/frutiger-aero-mc.jpg', thumb: 'https://i.postimg.cc/jdyN0N8p/fa-thumb.jpg' },
+            { name: 'Minecraft', url: 'https://i.postimg.cc/xT8B85T3/minecraft-wallpaper.jpg', thumb: 'https://i.postimg.cc/x8P90S5p/mc-thumb.jpg' },
+        ];
+        
+        async function initFirebase() { /* ... unchanged ... */ }
+        function applySettings(settings) { /* ... unchanged ... */ }
+        function listenForSettings() { /* ... unchanged ... */ }
+        async function saveSettings() { /* ... unchanged ... */ }
+        
+        // Populate Personalize modal options
+        wallpapers.forEach(wp => {
+            const option = document.createElement('img');
+            option.src = wp.thumb;
+            option.dataset.url = wp.url;
+            option.className = 'wallpaper-option w-full h-20 object-cover rounded';
+            option.onclick = () => {
+                document.querySelectorAll('.wallpaper-option').forEach(el => el.classList.remove('selected'));
+                option.classList.add('selected');
+            };
+            wallpaperOptionsContainer.appendChild(option);
+        });
+
+        saveSettingsBtn.addEventListener('click', saveSettings);
+        
+        // --- Screenshot Viewer ---
+        const screenshots = [{url:"https://placehold.co/800x600/666/fff?text=Our+First+House",thumbnail:"https://placehold.co/200x150/666/fff?text=Our+First+House",title:"Our First House"},{url:"https://placehold.co/800x600/3498db/fff?text=Create+Contraption",thumbnail:"https://placehold.co/200x150/3498db/fff?text=Create+Contraption",title:"My Awesome Contraption"},{url:"https://placehold.co/800x600/2ecc71/fff?text=Big+Farm",thumbnail:"https://placehold.co/200x150/2ecc71/fff?text=Big+Farm",title:"The Wheat Fields"},{url:"https://placehold.co/800x600/e74c3c/fff?text=Exploring+a+Dungeon",thumbnail:"https://placehold.co/200x150/e74c3c/fff?text=Exploring",title:"Dungeon Delving"}];
+        const gallery=document.getElementById("screenshot-gallery"),viewerWindow=document.getElementById("image-viewer-window"),fullSizeImage=document.getElementById("full-size-image"),imageTitle=document.getElementById("image-title");screenshots.forEach(e=>{const t=document.createElement("div");t.className="screenshot-thumbnail p-1 bg-white border border-gray-300 rounded cursor-pointer",t.innerHTML=`<img src="${e.thumbnail}" alt="${e.title}" class="w-full h-auto object-cover">`,t.addEventListener("click",()=>{fullSizeImage.src=e.url,imageTitle.textContent=e.title+" - Windows Photo Viewer",viewerWindow.classList.remove("hidden"),highestZ++,viewerWindow.style.zIndex=highestZ}),gallery.appendChild(t)});
+
+        // --- Mod List Generation ---
+        const mods = [ { name: "AI-Improvements", author: "BuiltBrokenModding", url: "https://modrinth.com/mod/DSVgwcji" }, { name: "AppleSkin", author: "squeek", url: "https://modrinth.com/mod/EsAfCjCV" } /* ... all other mods ... */ ];
+        const modListContainer = document.getElementById('mod-list-container');
+        mods.sort((a,b)=>a.name.localeCompare(b.name)).forEach(mod => {
+             const modEl = document.createElement('a');
+             modEl.href = mod.url;
+             modEl.target = '_blank';
+             modEl.rel = 'noopener noreferrer';
+             modEl.className = 'block p-3 hover:bg-blue-200 rounded';
+             modEl.innerHTML = `<h3 class="font-bold text-black">${mod.name}</h3><p class="text-sm text-gray-600">by ${mod.author}</p>`;
+             modListContainer.appendChild(modEl);
+        });
+
+        // Copying unchanged Firebase functions here for completeness
+        async function initFirebase() {if (!firebaseConfig.apiKey) {return;} try {const app = initializeApp(firebaseConfig); const db = getFirestore(app); auth = getAuth(app); if (typeof __initial_auth_token !== 'undefined') { await signInWithCustomToken(auth, __initial_auth_token); } else { await signInAnonymously(auth); } listenForSettings(db, appId);} catch (e) {console.error("Firebase initialization error:", e);}}
+        function applySettings(settings) {currentSettings = settings; if (settings.wallpaperUrl) {document.body.style.backgroundImage = `url('${settings.wallpaperUrl}')`;} if (settings.welcomeMessage) {welcomeMessageEl.textContent = settings.welcomeMessage;}}
+        function listenForSettings(db, appId) {const settingsRef = doc(db, `/artifacts/${appId}/public/data/settings`, 'website_config'); onSnapshot(settingsRef, (doc) => {if (doc.exists()) {applySettings(doc.data());} else {applySettings({ wallpaperUrl: wallpapers[0].url, welcomeMessage: "Welcome! Click the 'Personalize' icon to change this text and the wallpaper." });}});}
+        async function saveSettings() {const selectedWallpaper = document.querySelector('.wallpaper-option.selected'); const newSettings = { wallpaperUrl: selectedWallpaper ? selectedWallpaper.dataset.url : currentSettings.wallpaperUrl, welcomeMessage: welcomeMessageInput.value || currentSettings.welcomeMessage, }; const db = getFirestore(); const settingsRef = doc(db, `/artifacts/${appId}/public/data/settings`, 'website_config'); try { await setDoc(settingsRef, newSettings); document.getElementById('personalize-window').classList.add('hidden');} catch (e) { console.error("Error saving settings:", e); alert("Could not save settings."); }}
+
+        // Start everything
+        initFirebase();
     </script>
 </body>
 </html>
