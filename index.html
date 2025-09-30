@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Our Minecraft Server!</title>
+    <title>Un sito a caso lol</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
@@ -21,20 +21,6 @@
         }
         .header-nav a:hover {
             color: #a78bfa; /* Violet-400 */
-        }
-        .gemini-card {
-            background-color: #2a2a2a;
-            border: 1px solid #3a3a3a;
-            transition: box-shadow 0.3s;
-        }
-        .gemini-card:hover {
-            box-shadow: 0 0 15px rgba(129, 140, 248, 0.3);
-        }
-        .gemini-response {
-            background-color: #1e1e1e;
-            border: 1px solid #3a3a3a;
-            white-space: pre-wrap;
-            word-wrap: break-word;
         }
         .spinner {
             border-top-color: #818cf8;
@@ -59,50 +45,16 @@
     <main class="flex-grow">
         <div class="container mx-auto px-6 py-12">
             <div class="text-center mb-16">
-                <h1 class="text-5xl md:text-6xl font-bold tracking-tight text-white mb-4">Welcome to Our Server!</h1>
-                <p class="text-xl md:text-2xl text-indigo-300">Let's build some cool stuff.</p>
+                <h1 class="text-5xl md:text-6xl font-bold tracking-tight text-white mb-4">Buona</h1>
+                <p class="text-xl md:text-2xl text-indigo-300">M I N E C R A F T.</p>
             </div>
             
             <div class="max-w-4xl mx-auto space-y-6 text-lg text-gray-300">
-                <p>Hey everyone! Welcome to the homepage for our new modded server. This pack is all about building awesome factories with <strong>Create</strong>, becoming master chefs with <strong>Farmer's Delight</strong>, and finally having enough inventory space thanks to the <strong>Sophisticated</strong> mods.</p>
-                <p>I've also added <strong>Expanded Ecosphere</strong> to make the world look amazing, and the <strong>Dungeons and Taverns</strong> mods so we have some cool places to explore together. It should be a pretty stable and fun world to hang out in. Can't wait to see what you all build!</p>
+                <p>Sto modpack ha la <strong>Create</strong>come al solito e la <strong>Dungeons and Taverns</strong>poi c'è anche la <strong>Cataclysm</strong> e la <strong>Simply Swords</strong>.</p>
+                <p>Poi il resto non so se vi interessa.</p>
                 <div class="text-center pt-8">
                      <a href="mods.html" class="bg-indigo-500 hover:bg-indigo-600 text-white font-bold py-3 px-8 rounded-lg text-lg transition-transform transform hover:scale-105 inline-block">See the Full Mod List</a>
                 </div>
-            </div>
-
-            <!-- Gemini Features Section -->
-            <div class="mt-24 max-w-5xl mx-auto">
-                 <h2 class="text-4xl font-bold text-center mb-12 text-white">Need an Idea?</h2>
-                 <div class="grid md:grid-cols-2 gap-8">
-
-                    <!-- World Backstory Generator -->
-                    <div id="backstory-generator" class="gemini-card rounded-xl p-6 flex flex-col">
-                        <h3 class="text-2xl font-bold text-indigo-300 mb-4">Let's Make Up Some Lore</h3>
-                        <p class="text-gray-400 mb-4 flex-grow">Click the button to get a silly, random backstory for our world to get the creative juices flowing.</p>
-                        <button id="generate-backstory-btn" class="w-full bg-violet-500 hover:bg-violet-600 text-white font-bold py-2 px-4 rounded-lg transition">
-                            ✨ Tell Me a Story
-                        </button>
-                        <div id="backstory-loading" class="hidden justify-center items-center mt-4">
-                            <div class="spinner w-8 h-8 rounded-full border-4 border-gray-500"></div>
-                        </div>
-                        <div id="backstory-response" class="gemini-response mt-4 p-4 rounded-lg text-gray-300 hidden"></div>
-                    </div>
-
-                    <!-- Modpack Advisor -->
-                    <div id="modpack-advisor" class="gemini-card rounded-xl p-6 flex flex-col">
-                         <h3 class="text-2xl font-bold text-indigo-300 mb-4">What Should I Do Now?</h3>
-                        <p class="text-gray-400 mb-4 flex-grow">Not sure what to do next? Tell me what you've been up to and I'll give you some ideas.</p>
-                        <textarea id="advisor-input" class="w-full bg-[#1e1e1e] border border-[#3a3a3a] rounded-lg p-2 mb-4 text-gray-300" rows="3" placeholder="e.g., I just finished my hobbit hole..."></textarea>
-                        <button id="get-advice-btn" class="w-full bg-violet-500 hover:bg-violet-600 text-white font-bold py-2 px-4 rounded-lg transition">
-                            ✨ Give Me a Quest
-                        </button>
-                        <div id="advisor-loading" class="hidden justify-center items-center mt-4">
-                            <div class="spinner w-8 h-8 rounded-full border-4 border-gray-500"></div>
-                        </div>
-                        <div id="advisor-response" class="gemini-response mt-4 p-4 rounded-lg text-gray-300 hidden"></div>
-                    </div>
-                 </div>
             </div>
         </div>
     </main>
