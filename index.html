@@ -132,64 +132,6 @@
         document.addEventListener('click', () => {
             startMenu.classList.add('hidden');
         });
-
-        // Gemini API Logic (unchanged)
-        const generateBackstoryBtn = document.getElementById('generate-backstory-btn');
-        const backstoryResponseEl = document.getElementById('backstory-response');
-        const backstoryLoadingEl = document.getElementById('backstory-loading');
-        const getAdviceBtn = document.getElementById('get-advice-btn');
-        const advisorInput = document.getElementById('advisor-input');
-        const advisorResponseEl = document.getElementById('advisor-response');
-        const advisorLoadingEl = document.getElementById('advisor-loading');
-        const apiKey = "";
-        const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
-        
-        async function callGemini(payload, responseElement, loadingElement, buttonElement) {
-            loadingElement.classList.remove('hidden');
-            responseElement.classList.add('hidden');
-            buttonElement.disabled = true;
-            let retries = 3;
-            let delay = 1000;
-            while (retries > 0) {
-                try {
-                    const response = await fetch(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
-                    if (!response.ok) { throw new Error(`HTTP error! status: ${response.status}`); }
-                    const result = await response.json();
-                    const candidate = result.candidates?.[0];
-                    if (candidate && candidate.content?.parts?.[0]?.text) {
-                        responseElement.textContent = candidate.content.parts[0].text;
-                        responseElement.classList.remove('hidden');
-                    } else {
-                        responseElement.textContent = 'Whoops, the AI is sleeping. Try again in a bit.';
-                        responseElement.classList.remove('hidden');
-                    }
-                    return;
-                } catch (error) {
-                    console.error('API Call failed:', error);
-                    retries--;
-                    if (retries === 0) { responseElement.textContent = 'Error: The request failed. Tell the server owner the AI is broken!'; responseElement.classList.remove('hidden'); }
-                    await new Promise(res => setTimeout(res, delay));
-                    delay *= 2;
-                } finally {
-                    loadingElement.classList.add('hidden');
-                    buttonElement.disabled = false;
-                }
-            }
-        }
-        generateBackstoryBtn.addEventListener('click', async () => {
-            const systemPrompt = "You are a fun and creative friend on a Minecraft server. Your task is to write a short, fun, and slightly silly backstory for our shared Minecraft world. The story should be 2-3 paragraphs long and set up a fun adventure for a group of friends. It should hint at the kinds of things we can do with our mods without naming them: themes of building crazy contraptions (Create), cooking up big feasts (Farmer's Delight), exploring cool new places (Ecosphere, Dungeons), and having awesome gear (Sophisticated). Keep the tone light and exciting!";
-            const userQuery = `Tell us a fun backstory for our new Minecraft server!`;
-            const payload = { contents: [{ parts: [{ text: userQuery }] }], systemInstruction: { parts: [{ text: systemPrompt }] }, };
-            callGemini(payload, backstoryResponseEl, backstoryLoadingEl, generateBackstoryBtn);
-        });
-        getAdviceBtn.addEventListener('click', async () => {
-            const userInput = advisorInput.value.trim();
-            if (!userInput) { advisorResponseEl.textContent = "You gotta tell me what you've done first!"; advisorResponseEl.classList.remove('hidden'); return; }
-            const systemPrompt = `You are a helpful and enthusiastic friend on a modded Minecraft server. You know all about the mods we're using. Your job is to give 3 fun and creative ideas for what someone should do next, based on what they've told you. Talk directly to the person like a friend (use "You could..." or "What if you..."). Encourage them to use the mods and maybe even suggest projects they could do with other people on the server. Your tone should be encouraging and fun, not bossy.`;
-            const userQuery = `I'm playing on our server. So far, I've done this: "${userInput}". What are some fun ideas for what I should do next?`;
-            const payload = { contents: [{ parts: [{ text: userQuery }] }], systemInstruction: { parts: [{ text: systemPrompt }] }, };
-            callGemini(payload, advisorResponseEl, advisorLoadingEl, getAdviceBtn);
-        });
     </script>
 </body>
 </html>
