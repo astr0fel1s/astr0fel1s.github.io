@@ -290,7 +290,7 @@ function listenForSettings(db, appId) {
         wallpaperUrl:
           dynamicWallpapers.length > 0
             ? dynamicWallpapers[0].url
-            : "https://i.postimg.cc/W1V6yC1g/windows-7-wallpaper.jpg",
+            : "img/wallpapers/1 rain_world.png",
         welcomeMessage: "Welcome! Double-click 'Personalize' to customize.",
       });
     }
