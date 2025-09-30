@@ -4,28 +4,218 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Create & Beyond Modpack</title>
-    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #1a1a1a;
+            color: #e0e0e0;
+        }
+        .header-nav a {
+            transition: color 0.3s, border-bottom-color 0.3s;
+        }
+        .header-nav a.active {
+            color: #818cf8; /* Indigo-400 */
+            border-bottom-color: #818cf8;
+        }
+        .header-nav a:hover {
+            color: #a78bfa; /* Violet-400 */
+        }
+        .gemini-card {
+            background-color: #2a2a2a;
+            border: 1px solid #3a3a3a;
+            transition: box-shadow 0.3s;
+        }
+        .gemini-card:hover {
+            box-shadow: 0 0 15px rgba(129, 140, 248, 0.3);
+        }
+        .gemini-response {
+            background-color: #1e1e1e;
+            border: 1px solid #3a3a3a;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+        .spinner {
+            border-top-color: #818cf8;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
 </head>
-<body>
-    <header>
-        <nav>
-            <a href="index.html" class="active">Home</a>
-            <a href="mods.html">Mod List</a>
+<body class="min-h-screen flex flex-col">
+
+    <header class="bg-[#2a2a2a]/80 backdrop-blur-sm sticky top-0 z-10 border-b border-[#3a3a3a]">
+        <nav class="container mx-auto px-6 py-4 flex justify-center items-center">
+            <div class="header-nav flex space-x-8 text-lg">
+                <a href="index.html" class="py-1 border-b-2 border-transparent active">Home</a>
+                <a href="mods.html" class="py-1 border-b-2 border-transparent">Mod List</a>
+            </div>
         </nav>
     </header>
 
-    <main>
-        <div class="container">
-            <h1>Create & Beyond</h1>
-            <p class="subtitle">A Curated Minecraft 1.21.1 NeoForge Experience</p>
-            <p>Welcome to Create & Beyond, a modpack designed to enhance the vanilla Minecraft experience without losing its core charm. This pack is built around three pillars: sophisticated automation with <strong>Create</strong>, expanded farming and cooking with <strong>Farmer's Delight</strong>, and seamless logistics with the <strong>Sophisticated</strong> suite of mods.</p>
-            <p>Explore a world beautified by <strong>William Wythers' Expanded Ecosphere</strong> and populated with new, cohesive structures from the <strong>Dungeons and Taverns</strong> suite. With a robust collection of performance optimizations, quality-of-life improvements, and aesthetic enhancements, this modpack offers a stable, engaging, and beautiful world to build, farm, and explore in.</p>
-            <a href="mods.html" class="button">View the Full Mod List</a>
+    <main class="flex-grow">
+        <div class="container mx-auto px-6 py-12">
+            <div class="text-center mb-16">
+                <h1 class="text-5xl md:text-6xl font-bold tracking-tight text-white mb-4">Create & Beyond</h1>
+                <p class="text-xl md:text-2xl text-indigo-300">A Curated Minecraft 1.21.1 NeoForge Experience</p>
+            </div>
+            
+            <div class="max-w-4xl mx-auto space-y-6 text-lg text-gray-300">
+                <p>Welcome to Create & Beyond, a modpack designed to enhance the vanilla Minecraft experience without losing its core charm. This pack is built around three pillars: sophisticated automation with <strong>Create</strong>, expanded farming and cooking with <strong>Farmer's Delight</strong>, and seamless logistics with the <strong>Sophisticated</strong> suite of mods.</p>
+                <p>Explore a world beautified by <strong>William Wythers' Expanded Ecosphere</strong> and populated with new, cohesive structures from the <strong>Dungeons and Taverns</strong> suite. With a robust collection of performance optimizations, quality-of-life improvements, and aesthetic enhancements, this modpack offers a stable, engaging, and beautiful world to build, farm, and explore in.</p>
+                <div class="text-center pt-8">
+                     <a href="mods.html" class="bg-indigo-500 hover:bg-indigo-600 text-white font-bold py-3 px-8 rounded-lg text-lg transition-transform transform hover:scale-105 inline-block">View the Full Mod List</a>
+                </div>
+            </div>
+
+            <!-- Gemini Features Section -->
+            <div class="mt-24 max-w-5xl mx-auto">
+                 <h2 class="text-4xl font-bold text-center mb-12 text-white">✨ AI-Powered Tools ✨</h2>
+                 <div class="grid md:grid-cols-2 gap-8">
+
+                    <!-- World Backstory Generator -->
+                    <div id="backstory-generator" class="gemini-card rounded-xl p-6 flex flex-col">
+                        <h3 class="text-2xl font-bold text-indigo-300 mb-4">World Backstory Generator</h3>
+                        <p class="text-gray-400 mb-4 flex-grow">Spark your creativity! Generate a unique backstory for your Minecraft world, inspired by the mods in this pack.</p>
+                        <button id="generate-backstory-btn" class="w-full bg-violet-500 hover:bg-violet-600 text-white font-bold py-2 px-4 rounded-lg transition">
+                            ✨ Generate Story
+                        </button>
+                        <div id="backstory-loading" class="hidden justify-center items-center mt-4">
+                            <div class="spinner w-8 h-8 rounded-full border-4 border-gray-500"></div>
+                        </div>
+                        <div id="backstory-response" class="gemini-response mt-4 p-4 rounded-lg text-gray-300 hidden"></div>
+                    </div>
+
+                    <!-- Modpack Advisor -->
+                    <div id="modpack-advisor" class="gemini-card rounded-xl p-6 flex flex-col">
+                         <h3 class="text-2xl font-bold text-indigo-300 mb-4">Modpack Advisor</h3>
+                        <p class="text-gray-400 mb-4 flex-grow">Feeling stuck? Describe what you've done, and the advisor will suggest what you could do next!</p>
+                        <textarea id="advisor-input" class="w-full bg-[#1e1e1e] border border-[#3a3a3a] rounded-lg p-2 mb-4 text-gray-300" rows="3" placeholder="e.g., I've just set up my first wheat farm..."></textarea>
+                        <button id="get-advice-btn" class="w-full bg-violet-500 hover:bg-violet-600 text-white font-bold py-2 px-4 rounded-lg transition">
+                            ✨ Get Advice
+                        </button>
+                        <div id="advisor-loading" class="hidden justify-center items-center mt-4">
+                            <div class="spinner w-8 h-8 rounded-full border-4 border-gray-500"></div>
+                        </div>
+                        <div id="advisor-response" class="gemini-response mt-4 p-4 rounded-lg text-gray-300 hidden"></div>
+                    </div>
+                 </div>
+            </div>
         </div>
     </main>
 
-    <footer>
-        <p>Modpack curated for Minecraft 1.21.1 NeoForge.</p>
+    <footer class="bg-[#2a2a2a] border-t border-[#3a3a3a] mt-16">
+        <div class="container mx-auto px-6 py-4 text-center text-gray-400">
+            <p>Modpack curated for Minecraft 1.21.1 NeoForge. AI features powered by Google Gemini.</p>
+        </div>
     </footer>
+
+    <script type="module">
+        const generateBackstoryBtn = document.getElementById('generate-backstory-btn');
+        const backstoryResponseEl = document.getElementById('backstory-response');
+        const backstoryLoadingEl = document.getElementById('backstory-loading');
+
+        const getAdviceBtn = document.getElementById('get-advice-btn');
+        const advisorInput = document.getElementById('advisor-input');
+        const advisorResponseEl = document.getElementById('advisor-response');
+        const advisorLoadingEl = document.getElementById('advisor-loading');
+
+        const apiKey = ""; // API key is handled by the environment.
+        const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
+
+        const modList = [
+            "AI-Improvements", "AppleSkin", "AsyncParticles", "Athena", "BadOptimizations", "BetterF3", 
+            "Catalogue", "Cerulean", "Chipped", "Chunky", "Cloth Config API", "Colorwheel", "Colorwheel Patcher", 
+            "Concurrent Chunk Management Engine", "Configured", "Cool Rain", "Create", "Create: Smart Bounds", 
+            "Cristel Lib", "EntityCulling", "Expanded Ecosphere", "Farmer's Delight", "FastBoot", "Ferrite Core", 
+            "Fzzy Config", "Handcrafted", "ImmediatelyFast", "Immersive Aircraft", "Immersive Armors", 
+            "Immersive Furniture", "Immersive Machinery", "Immersive Melodies", "Immersive Paintings", "Iris", 
+            "Jade", "Jade Addons", "Kotlin for Forge", "Lithium", "M.R.U", "Model Gap Fix", "ModernFix", 
+            "More Culling", "Mouse Tweaks", "Noisium", "Particle Rain", "Polytone", "Redirected", 
+            "Reese's Sodium Options", "Resourceful Lib", "Resourcify", "ScalableLux", "ServerCore", "Sodium", 
+            "Sodium Extra", "Sophisticated Backpacks", "Sophisticated Core", "Sophisticated Storage", 
+            "Sounds", "TxniLib", "YetAnotherConfigLib", "Dungeons and Taverns Suite"
+        ];
+        
+        async function callGemini(payload, responseElement, loadingElement, buttonElement) {
+            loadingElement.classList.remove('hidden');
+            responseElement.classList.add('hidden');
+            buttonElement.disabled = true;
+            let retries = 3;
+            let delay = 1000;
+
+            while (retries > 0) {
+                try {
+                    const response = await fetch(apiUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+
+                    const result = await response.json();
+                    const candidate = result.candidates?.[0];
+
+                    if (candidate && candidate.content?.parts?.[0]?.text) {
+                        responseElement.textContent = candidate.content.parts[0].text;
+                        responseElement.classList.remove('hidden');
+                    } else {
+                        responseElement.textContent = 'Error: Could not retrieve a valid response from the API.';
+                        responseElement.classList.remove('hidden');
+                    }
+                    return; // Success
+                } catch (error) {
+                    console.error('API Call failed:', error);
+                    retries--;
+                    if (retries === 0) {
+                       responseElement.textContent = 'Error: The request failed after multiple retries. Please try again later.';
+                       responseElement.classList.remove('hidden');
+                    }
+                    await new Promise(res => setTimeout(res, delay));
+                    delay *= 2; // Exponential backoff
+                } finally {
+                    loadingElement.classList.add('hidden');
+                    buttonElement.disabled = false;
+                }
+            }
+        }
+
+        generateBackstoryBtn.addEventListener('click', async () => {
+            const systemPrompt = "You are a creative storyteller and Minecraft expert. Your task is to write a short, inspiring, and slightly mysterious backstory for a Minecraft world. The story should be 2-3 paragraphs long and weave in themes from the installed mods without explicitly naming them. Key themes are: complex machinery and automation (from Create), advanced agriculture and cooking (from Farmer's Delight), clever storage solutions (from Sophisticated Storage), and a vibrant, diverse natural world with hidden structures (from Expanded Ecosphere and Dungeons & Taverns).";
+            const userQuery = `Generate a world backstory based on these mods: Create, Farmer's Delight, Sophisticated Storage, Expanded Ecosphere, Dungeons and Taverns.`;
+
+            const payload = {
+                contents: [{ parts: [{ text: userQuery }] }],
+                systemInstruction: { parts: [{ text: systemPrompt }] },
+            };
+            
+            callGemini(payload, backstoryResponseEl, backstoryLoadingEl, generateBackstoryBtn);
+        });
+
+        getAdviceBtn.addEventListener('click', async () => {
+            const userInput = advisorInput.value.trim();
+            if (!userInput) {
+                advisorResponseEl.textContent = "Please tell me what you've done so I can give you advice!";
+                advisorResponseEl.classList.remove('hidden');
+                return;
+            }
+
+            const systemPrompt = `You are a helpful and knowledgeable Minecraft modpack advisor. You are an expert on the following mods: ${modList.join(', ')}. Your task is to provide 3-4 clear, actionable, and creative suggestions for what a player should do next based on their current progress. Explain *why* each suggestion is a good next step. The suggestions should encourage the player to explore the mechanics of the installed mods.`;
+            const userQuery = `I'm playing a Minecraft modpack with the mods listed above. Here is my current progress: "${userInput}". What should I do next?`;
+
+            const payload = {
+                contents: [{ parts: [{ text: userQuery }] }],
+                systemInstruction: { parts: [{ text: systemPrompt }] },
+            };
+            
+            callGemini(payload, advisorResponseEl, advisorLoadingEl, getAdviceBtn);
+        });
+    </script>
 </body>
 </html>
