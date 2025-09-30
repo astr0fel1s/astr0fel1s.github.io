@@ -9,61 +9,84 @@
     <style>
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #1a1a1a;
-            color: #e0e0e0;
+            background-image: url('https://i.postimg.cc/k4D2k3Qx/frutiger-aero-background.jpg');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            cursor: none; /* Hide default cursor for loupe effect */
         }
-        .header-nav a {
-            transition: color 0.3s, border-bottom-color 0.3s;
+        .header-nav a.active { color: #2563eb; font-weight: 700; }
+        .header-nav a:hover { color: #3b82f6; }
+        .aero-panel {
+            background-color: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
         }
-        .header-nav a.active {
-            color: #818cf8; /* Indigo-400 */
-            border-bottom-color: #818cf8;
-        }
-         .header-nav a:hover {
-            color: #a78bfa; /* Violet-400 */
-        }
-        .mod-item {
-             background-color: #2a2a2a;
-             border: 1px solid #3a3a3a;
-             transition: transform 0.2s, box-shadow 0.2s;
-        }
-        .mod-item:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        .mouse-loupe {
+            position: fixed;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            border: 3px solid rgba(255, 255, 255, 0.8);
+            box-shadow: 0 0 20px rgba(59, 130, 246, 0.7), inset 0 0 10px rgba(255, 255, 255, 0.5);
+            pointer-events: none; /* Allows clicking through the loupe */
+            transform: translate(-50%, -50%); /* Center on cursor */
+            transition: width 0.2s, height 0.2s;
+            z-index: 9999;
+            backdrop-filter: brightness(1.1);
+            -webkit-backdrop-filter: brightness(1.1);
         }
     </style>
 </head>
-<body class="min-h-screen flex flex-col">
+<body class="min-h-screen text-slate-800">
 
-    <header class="bg-[#2a2a2a]/80 backdrop-blur-sm sticky top-0 z-10 border-b border-[#3a3a3a]">
+    <header class="aero-panel sticky top-0 z-10">
         <nav class="container mx-auto px-6 py-4 flex justify-center items-center">
-            <div class="header-nav flex space-x-8 text-lg">
-                <a href="index.html" class="py-1 border-b-2 border-transparent">Home</a>
-                <a href="mods.html" class="py-1 border-b-2 border-transparent active">Mod List</a>
+            <div class="header-nav flex space-x-8 text-lg font-medium text-slate-600">
+                <a href="index.html" class="py-1 transition-colors duration-200">Home</a>
+                <a href="mods.html" class="py-1 transition-colors duration-200 active">Mod List</a>
             </div>
         </nav>
     </header>
 
-    <main class="flex-grow">
-        <div class="container mx-auto px-6 py-12">
-            <div class="text-center mb-12">
-                <h1 class="text-5xl font-bold tracking-tight text-white">Here's All The Mods</h1>
-                <p class="text-xl text-indigo-300 mt-2">Just in case you were curious what's running under the hood.</p>
-            </div>
-            
-            <div id="mod-list-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                <!-- Mod list will be dynamically inserted here -->
-            </div>
+    <main class="container mx-auto px-6 py-12">
+        <div class="text-center mb-12">
+            <h1 class="text-5xl font-bold tracking-tight text-slate-900">Here's All The Mods</h1>
+            <p class="text-xl text-blue-600 font-medium mt-2">Just in case you were curious what's running under the hood.</p>
+        </div>
+        
+        <div id="mod-list-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <!-- Mod list will be dynamically inserted here -->
         </div>
     </main>
     
-    <footer class="bg-[#2a2a2a] border-t border-[#3a3a3a] mt-16">
-        <div class="container mx-auto px-6 py-4 text-center text-gray-400">
+    <footer class="aero-panel mt-16">
+        <div class="container mx-auto px-6 py-4 text-center text-slate-600">
             <p>Our little corner of the internet. Have fun!</p>
         </div>
     </footer>
 
+    <!-- Mouse Loupe Element -->
+    <div class="mouse-loupe"></div>
+
     <script>
+        // --- Loupe Logic ---
+        const loupe = document.querySelector('.mouse-loupe');
+        window.addEventListener('mousemove', (e) => {
+            loupe.style.left = `${e.clientX}px`;
+            loupe.style.top = `${e.clientY}px`;
+        });
+        document.addEventListener('mousedown', () => {
+            loupe.style.width = '70px';
+            loupe.style.height = '70px';
+        });
+        document.addEventListener('mouseup', () => {
+            loupe.style.width = '80px';
+            loupe.style.height = '80px';
+        });
+
+        // --- Mod List Logic ---
         const mods = [
             { name: "AI-Improvements", author: "BuiltBrokenModding", url: "https://modrinth.com/mod/DSVgwcji" },
             { name: "AppleSkin", author: "squeek", url: "https://modrinth.com/mod/EsAfCjCV" },
@@ -134,11 +157,11 @@
             modElement.href = mod.url;
             modElement.target = '_blank';
             modElement.rel = 'noopener noreferrer';
-            modElement.className = 'mod-item block p-6 rounded-lg';
+            modElement.className = 'aero-panel block p-5 rounded-lg hover:border-blue-500/80 transition-colors duration-200 transform hover:-translate-y-1';
             
             modElement.innerHTML = `
-                <h3 class="text-xl font-bold text-indigo-300">${mod.name}</h3>
-                <p class="text-gray-400">by ${mod.author}</p>
+                <h3 class="text-xl font-bold text-blue-700">${mod.name}</h3>
+                <p class="text-slate-600">by ${mod.author}</p>
             `;
             
             container.appendChild(modElement);
