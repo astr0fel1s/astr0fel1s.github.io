@@ -147,47 +147,53 @@
         import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, onSnapshot, setDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // --- Draggable Elements & Window Management ---
+        // --- Draggable Elements & Window Management (IMPROVED) ---
         let highestZ = 10;
-        const GRID_SIZE = 20; // Snap icons to a 20x20 grid
+        const GRID_SIZE = 20;
         
         function makeDraggable(element, handle) {
-            let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
-            
-            const dragMouseDown = (e) => {
-                e = e || window.event;
-                e.preventDefault();
-                pos3 = e.clientX;
-                pos4 = e.clientY;
-                document.onmouseup = closeDragElement;
-                document.onmousemove = elementDrag;
+            let offsetX = 0, offsetY = 0;
 
+            const dragMouseDown = (e) => {
+                e.preventDefault();
+                
+                // Bring window to front
                 if (element.classList.contains('win7-window')) {
                     highestZ++;
                     element.style.zIndex = highestZ;
                 }
+
+                // Calculate the mouse offset from the element's top-left corner
+                const rect = element.getBoundingClientRect();
+                const desktopRect = document.getElementById('desktop').getBoundingClientRect();
+                offsetX = e.clientX - (rect.left - desktopRect.left);
+                offsetY = e.clientY - (rect.top - desktopRect.top);
+
+                document.onmousemove = elementDrag;
+                document.onmouseup = closeDragElement;
             };
 
             handle.onmousedown = dragMouseDown;
 
             const elementDrag = (e) => {
-                e = e || window.event;
                 e.preventDefault();
-                pos1 = pos3 - e.clientX;
-                pos2 = pos4 - e.clientY;
-                pos3 = e.clientX;
-                pos4 = e.clientY;
-
-                let newTop = element.offsetTop - pos2;
-                let newLeft = element.offsetLeft - pos1;
+                const desktopRect = document.getElementById('desktop').getBoundingClientRect();
+                
+                let newLeft = e.clientX - desktopRect.left - offsetX;
+                let newTop = e.clientY - desktopRect.top - offsetY;
 
                 if (element.classList.contains('desktop-icon')) {
-                    newTop = Math.round(newTop / GRID_SIZE) * GRID_SIZE;
+                    // Snap the calculated position to the grid
                     newLeft = Math.round(newLeft / GRID_SIZE) * GRID_SIZE;
+                    newTop = Math.round(newTop / GRID_SIZE) * GRID_SIZE;
                 }
 
-                element.style.top = newTop + "px";
-                element.style.left = newLeft + "px";
+                // Constrain to desktop bounds
+                newLeft = Math.max(0, Math.min(newLeft, desktopRect.width - element.offsetWidth));
+                newTop = Math.max(0, Math.min(newTop, desktopRect.height - element.offsetHeight));
+
+                element.style.left = newLeft + 'px';
+                element.style.top = newTop + 'px';
             };
 
             const closeDragElement = () => {
@@ -208,7 +214,6 @@
                     windowEl.classList.remove('hidden');
                     highestZ++;
                     windowEl.style.zIndex = highestZ;
-                    // Special handler for personalize window
                     if(windowId === 'personalize-window') {
                         openPersonalizeModal();
                     }
@@ -235,7 +240,7 @@
         let selectedWallpaperUrlForSave = '';
 
         const wallpapers = [
-            { name: 'Windows 7', url: 'https://i.imgur.com/mp91bQE.jpeg', thumb: 'https://i.imgur.com/mp91bQE.jpeg' },
+            { name: 'Windows 7', url: 'https://i.postimg.cc/W1V6yC1g/windows-7-wallpaper.jpg', thumb: 'https://i.postimg.cc/J0B7WfN8/win7-thumb.jpg' },
             { name: 'Bliss', url: 'https://i.postimg.cc/3JcWWzmp/bliss.jpg', thumb: 'https://i.postimg.cc/zX3rNtjM/bliss-thumb.jpg' },
             { name: 'Frutiger Aero', url: 'https://i.postimg.cc/L8p5gX1f/frutiger-aero-mc.jpg', thumb: 'https://i.postimg.cc/jdyN0N8p/fa-thumb.jpg' },
             { name: 'Minecraft', url: 'https://i.postimg.cc/xT8B85T3/minecraft-wallpaper.jpg', thumb: 'https://i.postimg.cc/x8P90S5p/mc-thumb.jpg' },
@@ -305,6 +310,10 @@
         }
 
         async function saveSettings() {
+            if (!Object.keys(firebaseConfig).length) {
+                alert("Cannot save settings. Firebase is not configured.");
+                return;
+            }
             const newSettings = { 
                 wallpaperUrl: selectedWallpaperUrlForSave, 
                 welcomeMessage: welcomeMessageInput.value || currentSettings.welcomeMessage, 
@@ -369,4 +378,3 @@
     </script>
 </body>
 </html>
-
