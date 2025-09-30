@@ -298,8 +298,8 @@ function listenForSettings(db, appId) {
 }
 async function fetchWallpapersFromGitHub() {
   if (
-    GITHUB_USERNAME === "YOUR_USERNAME" ||
-    GITHUB_REPONAME === "YOUR_REPONAME"
+    GITHUB_USERNAME === "astr0fel1s" ||
+    GITHUB_REPONAME === "astr0fel1s.github.io"
   ) {
     console.warn(
       "GitHub username/repo not set. Cannot fetch dynamic wallpapers.",
