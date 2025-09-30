@@ -220,6 +220,7 @@
         const welcomeMessageInput = document.getElementById('welcome-message-input');
         const wallpaperOptionsContainer = document.getElementById('wallpaper-options');
         const saveSettingsBtn = document.getElementById('save-settings-btn');
+        let auth;
         let currentSettings = {};
         
         const wallpapers = [
@@ -229,10 +230,63 @@
             { name: 'Minecraft', url: 'https://i.postimg.cc/xT8B85T3/minecraft-wallpaper.jpg', thumb: 'https://i.postimg.cc/x8P90S5p/mc-thumb.jpg' },
         ];
         
-        async function initFirebase() { /* ... unchanged ... */ }
-        function applySettings(settings) { /* ... unchanged ... */ }
-        function listenForSettings() { /* ... unchanged ... */ }
-        async function saveSettings() { /* ... unchanged ... */ }
+        async function initFirebase() {
+            if (!firebaseConfig.apiKey) {
+                console.warn("Firebase config not found. Personalization will not persist.");
+                return;
+            } 
+            try {
+                const app = initializeApp(firebaseConfig); 
+                const db = getFirestore(app); 
+                auth = getAuth(app); 
+                if (typeof __initial_auth_token !== 'undefined') { 
+                    await signInWithCustomToken(auth, __initial_auth_token); 
+                } else { 
+                    await signInAnonymously(auth); 
+                } 
+                listenForSettings(db, appId);
+            } catch (e) {
+                console.error("Firebase initialization error:", e);
+            }
+        }
+
+        function applySettings(settings) {
+            currentSettings = settings; 
+            if (settings.wallpaperUrl) {
+                document.body.style.backgroundImage = `url('${settings.wallpaperUrl}')`;
+            } 
+            if (settings.welcomeMessage) {
+                welcomeMessageEl.textContent = settings.welcomeMessage;
+            }
+        }
+
+        function listenForSettings(db, appId) {
+            const settingsRef = doc(db, `/artifacts/${appId}/public/data/settings`, 'website_config'); 
+            onSnapshot(settingsRef, (doc) => {
+                if (doc.exists()) {
+                    applySettings(doc.data());
+                } else {
+                    applySettings({ wallpaperUrl: wallpapers[0].url, welcomeMessage: "Welcome! Click the 'Personalize' icon to change this text and the wallpaper." });
+                }
+            });
+        }
+        
+        async function saveSettings() {
+            const selectedWallpaper = document.querySelector('.wallpaper-option.selected'); 
+            const newSettings = { 
+                wallpaperUrl: selectedWallpaper ? selectedWallpaper.dataset.url : currentSettings.wallpaperUrl, 
+                welcomeMessage: welcomeMessageInput.value || currentSettings.welcomeMessage, 
+            }; 
+            const db = getFirestore(); 
+            const settingsRef = doc(db, `/artifacts/${appId}/public/data/settings`, 'website_config'); 
+            try { 
+                await setDoc(settingsRef, newSettings); 
+                document.getElementById('personalize-window').classList.add('hidden');
+            } catch (e) { 
+                console.error("Error saving settings:", e); 
+                alert("Could not save settings."); 
+            }
+        }
         
         // Populate Personalize modal options
         wallpapers.forEach(wp => {
@@ -250,11 +304,96 @@
         saveSettingsBtn.addEventListener('click', saveSettings);
         
         // --- Screenshot Viewer ---
-        const screenshots = [{url:"https://placehold.co/800x600/666/fff?text=Our+First+House",thumbnail:"https://placehold.co/200x150/666/fff?text=Our+First+House",title:"Our First House"},{url:"https://placehold.co/800x600/3498db/fff?text=Create+Contraption",thumbnail:"https://placehold.co/200x150/3498db/fff?text=Create+Contraption",title:"My Awesome Contraption"},{url:"https://placehold.co/800x600/2ecc71/fff?text=Big+Farm",thumbnail:"https://placehold.co/200x150/2ecc71/fff?text=Big+Farm",title:"The Wheat Fields"},{url:"https://placehold.co/800x600/e74c3c/fff?text=Exploring+a+Dungeon",thumbnail:"https://placehold.co/200x150/e74c3c/fff?text=Exploring",title:"Dungeon Delving"}];
-        const gallery=document.getElementById("screenshot-gallery"),viewerWindow=document.getElementById("image-viewer-window"),fullSizeImage=document.getElementById("full-size-image"),imageTitle=document.getElementById("image-title");screenshots.forEach(e=>{const t=document.createElement("div");t.className="screenshot-thumbnail p-1 bg-white border border-gray-300 rounded cursor-pointer",t.innerHTML=`<img src="${e.thumbnail}" alt="${e.title}" class="w-full h-auto object-cover">`,t.addEventListener("click",()=>{fullSizeImage.src=e.url,imageTitle.textContent=e.title+" - Windows Photo Viewer",viewerWindow.classList.remove("hidden"),highestZ++,viewerWindow.style.zIndex=highestZ}),gallery.appendChild(t)});
+        const screenshots = [
+            {url:"https://placehold.co/800x600/666/fff?text=Our+First+House",thumbnail:"https://placehold.co/200x150/666/fff?text=Our+First+House",title:"Our First House"},
+            {url:"https://placehold.co/800x600/3498db/fff?text=Create+Contraption",thumbnail:"https://placehold.co/200x150/3498db/fff?text=Create+Contraption",title:"My Awesome Contraption"},
+            {url:"https://placehold.co/800x600/2ecc71/fff?text=Big+Farm",thumbnail:"https://placehold.co/200x150/2ecc71/fff?text=Big+Farm",title:"The Wheat Fields"},
+            {url:"https://placehold.co/800x600/e74c3c/fff?text=Exploring+a+Dungeon",thumbnail:"https://placehold.co/200x150/e74c3c/fff?text=Exploring",title:"Dungeon Delving"}
+        ];
+        const gallery = document.getElementById("screenshot-gallery");
+        const viewerWindow = document.getElementById("image-viewer-window");
+        const fullSizeImage = document.getElementById("full-size-image");
+        const imageTitle = document.getElementById("image-title");
+        
+        screenshots.forEach(screenshot => {
+            const thumbDiv = document.createElement("div");
+            thumbDiv.className = "screenshot-thumbnail p-1 bg-white border border-gray-300 rounded cursor-pointer";
+            thumbDiv.innerHTML = `<img src="${screenshot.thumbnail}" alt="${screenshot.title}" class="w-full h-auto object-cover">`;
+            
+            thumbDiv.addEventListener("click", () => {
+                fullSizeImage.src = screenshot.url;
+                imageTitle.textContent = screenshot.title + " - Windows Photo Viewer";
+                viewerWindow.classList.remove("hidden");
+                highestZ++;
+                viewerWindow.style.zIndex = highestZ
+            });
+            gallery.appendChild(thumbDiv)
+        });
 
         // --- Mod List Generation ---
-        const mods = [ { name: "AI-Improvements", author: "BuiltBrokenModding", url: "https://modrinth.com/mod/DSVgwcji" }, { name: "AppleSkin", author: "squeek", url: "https://modrinth.com/mod/EsAfCjCV" } /* ... all other mods ... */ ];
+        const mods = [
+            { name: "AI-Improvements", author: "BuiltBrokenModding", url: "https://modrinth.com/mod/DSVgwcji" },
+            { name: "AppleSkin", author: "squeek", url: "https://modrinth.com/mod/EsAfCjCV" },
+            { name: "AsyncParticles", author: "Harvey_Husky", url: "https://modrinth.com/mod/c3onkd5k" },
+            { name: "Athena", author: "ThatGravyBoat", url: "https://modrinth.com/mod/b1ZV3DIJ" },
+            { name: "BadOptimizations", author: "Thosea", url: "https://modrinth.com/mod/g96Z4WVZ" },
+            { name: "BetterF3", author: "TreyRuffy, cominixo", url: "https://modrinth.com/mod/8shC1gFX" },
+            { name: "Catalogue", author: "MrCrayfish", url: "https://www.curseforge.com/minecraft/mc-mods/catalogue" },
+            { name: "Cerulean", author: "Toni, Mephodio", url: "https://modrinth.com/mod/dv57xmf9" },
+            { name: "Chipped", author: "Alex Nijjar, Grimbop, Kekie6, ThatGravyBoat", url: "https://modrinth.com/mod/BAscRYKm" },
+            { name: "Chunky", author: "pop4959", url: "https://modrinth.com/mod/fALzjamp" },
+            { name: "Cloth Config v15 API", author: "shedaniel", url: "https://modrinth.com/mod/9s6osm5g" },
+            { name: "Colorwheel", author: "djefrey", url: "https://modrinth.com/mod/BzHgFoGz" },
+            { name: "Colorwheel Patcher", author: "djefrey", url: "https://modrinth.com/mod/KPsw5jDu" },
+            { name: "Concurrent Chunk Management Engine", author: "RelativityMC, ishland", url: "https://modrinth.com/mod/COlSi5iR" },
+            { name: "Configured", author: "MrCrayfish", url: "https://www.curseforge.com/minecraft/mc-mods/configured" },
+            { name: "Cool Rain", author: "Jaiz", url: "https://modrinth.com/mod/iDyqnQLT" },
+            { name: "Create", author: "simibubi", url: "https://modrinth.com/mod/LNytGWDc" },
+            { name: "Create: Smart Bounds", author: "LiukRast", url: "https://modrinth.com/mod/kSok4DxT" },
+            { name: "Cristel Lib", author: "Cristelknight", url: "https://modrinth.com/mod/cl223EMc" },
+            { name: "Dungeons and Taverns Suite", author: "Nova_Wostra", url: "https://www.curseforge.com/minecraft/mc-mods/dungeons-and-taverns" },
+            { name: "EntityCulling", author: "tr7zw", url: "https://modrinth.com/mod/NNAgCjsB" },
+            { name: "Expanded Ecosphere", author: "William Wythers, Cristelknight999", url: "https://modrinth.com/mod/O1XGs7ps" },
+            { name: "Farmer's Delight", author: "vectorwing", url: "https://modrinth.com/mod/R2OftAxM" },
+            { name: "FastBoot", author: "dnlayu", url: "https://modrinth.com/mod/nRL5uFe0" },
+            { name: "Ferrite Core", author: "malte0811", url: "https://modrinth.com/mod/uXXizFIs" },
+            { name: "Fzzy Config", author: "fzzyhmstrs", url: "https://modrinth.com/mod/hYykXjDp" },
+            { name: "Handcrafted", author: "Alex Nijjar, Kekie6", url: "https://modrinth.com/mod/pJmCFF0p" },
+            { name: "ImmediatelyFast", author: "RK_01", url: "https://modrinth.com/mod/5ZwdcRci" },
+            { name: "Immersive Aircraft", author: "Luke100000", url: "https://modrinth.com/mod/x3HZvrj6" },
+            { name: "Immersive Armors", author: "Luke100000", url: "https://modrinth.com/mod/eE2Db4YU" },
+            { name: "Immersive Furniture", author: "Luke100000", url: "https://modrinth.com/mod/SvN6UGeF" },
+            { name: "Immersive Machinery", author: "Luke100000", url: "https://modrinth.com/mod/kGP3J2TW" },
+            { name: "Immersive Melodies", author: "Luke100000", url: "https://modrinth.com/mod/TaSmHw8V" },
+            { name: "Immersive Paintings", author: "Luke100000", url: "https://modrinth.com/mod/6txNkua3" },
+            { name: "Iris", author: "coderbot, IMS212", url: "https://modrinth.com/mod/YL57xq9U" },
+            { name: "Jade", author: "Snownee", url: "https://modrinth.com/mod/nvQzSEkH" },
+            { name: "Jade Addons", author: "Snownee", url: "https://modrinth.com/mod/xuDOzCLy" },
+            { name: "Kotlin for Forge", author: "thedarkcolour", url: "https://modrinth.com/mod/ordsPcFz" },
+            { name: "Lithium", author: "2No2Name, JellySquid", url: "https://modrinth.com/mod/gvQqBUqZ" },
+            { name: "M.R.U", author: "IMB11 (mineblock11)", url: "https://modrinth.com/mod/SNVQ2c0g" },
+            { name: "Model Gap Fix", author: "MehVahdJukaar", url: "https://modrinth.com/mod/QdG47OkI" },
+            { name: "ModernFix", author: "embeddedt", url: "https://modrinth.com/mod/nmDcB62a" },
+            { name: "More Culling", author: "FX - PR0CESS, 1Foxy2", url: "https://modrinth.com/mod/51shyZVL" },
+            { name: "Mouse Tweaks", author: "Ivan Molodetskikh (YaLTeR)", url: "https://modrinth.com/mod/aC3cM3Vq" },
+            { name: "Noisium", author: "Steveplays28", url: "https://modrinth.com/mod/KuNKN7d2" },
+            { name: "Particle Rain", author: "PigCart", url: "https://modrinth.com/mod/nrikgvxm" },
+            { name: "Polytone", author: "MehVahdJukaar", url: "https://modrinth.com/mod/3qAYkBMB" },
+            { name: "Redirected", author: "Toni", url: "https://modrinth.com/mod/hhnR8xqU" },
+            { name: "Reese's Sodium Options", author: "FlashyReese", url: "https://modrinth.com/mod/Bh37bMuy" },
+            { name: "Resourceful Lib", author: "ThatGravyBoat, Epic_Oreo", url: "https://modrinth.com/mod/G1hIVOrD" },
+            { name: "Resourcify", author: "DeDiamondPro", url: "https://modrinth.com/mod/RLzHAoZe" },
+            { name: "ScalableLux", author: "Spottedleaf, ishland", url: "https://modrinth.com/mod/Ps1zyz6x" },
+            { name: "ServerCore", author: "Wesley1808", url: "https://modrinth.com/mod/4WWQxlQP" },
+            { name: "Sodium", author: "JellySquid, IMS212", url: "https://modrinth.com/mod/AANobbMI" },
+            { name: "Sodium Extra", author: "FlashyReese", url: "https://modrinth.com/mod/PtjYWJkn" },
+            { name: "Sophisticated Backpacks", author: "P3pp3rF1y, Ridanisaurus", url: "https://modrinth.com/mod/TyCTlI4b" },
+            { name: "Sophisticated Core", author: "P3pp3rF1y", url: "https://modrinth.com/mod/nmoqTijg" },
+            { name: "Sophisticated Storage", author: "P3pp3rF1y, Ridanisaurus", url: "https://modrinth.com/mod/hMlaZH8f" },
+            { name: "Sounds", author: "IMB11", url: "https://modrinth.com/mod/ZouiUX7t" },
+            { name: "TxniLib", author: "Toni", url: "https://modrinth.com/mod/vBbPDuOs" },
+            { name: "YetAnotherConfigLib", author: "isXander", url: "https://modrinth.com/mod/1eAoo2KR" }
+        ];
         const modListContainer = document.getElementById('mod-list-container');
         mods.sort((a,b)=>a.name.localeCompare(b.name)).forEach(mod => {
              const modEl = document.createElement('a');
@@ -265,12 +404,6 @@
              modEl.innerHTML = `<h3 class="font-bold text-black">${mod.name}</h3><p class="text-sm text-gray-600">by ${mod.author}</p>`;
              modListContainer.appendChild(modEl);
         });
-
-        // Copying unchanged Firebase functions here for completeness
-        async function initFirebase() {if (!firebaseConfig.apiKey) {return;} try {const app = initializeApp(firebaseConfig); const db = getFirestore(app); auth = getAuth(app); if (typeof __initial_auth_token !== 'undefined') { await signInWithCustomToken(auth, __initial_auth_token); } else { await signInAnonymously(auth); } listenForSettings(db, appId);} catch (e) {console.error("Firebase initialization error:", e);}}
-        function applySettings(settings) {currentSettings = settings; if (settings.wallpaperUrl) {document.body.style.backgroundImage = `url('${settings.wallpaperUrl}')`;} if (settings.welcomeMessage) {welcomeMessageEl.textContent = settings.welcomeMessage;}}
-        function listenForSettings(db, appId) {const settingsRef = doc(db, `/artifacts/${appId}/public/data/settings`, 'website_config'); onSnapshot(settingsRef, (doc) => {if (doc.exists()) {applySettings(doc.data());} else {applySettings({ wallpaperUrl: wallpapers[0].url, welcomeMessage: "Welcome! Click the 'Personalize' icon to change this text and the wallpaper." });}});}
-        async function saveSettings() {const selectedWallpaper = document.querySelector('.wallpaper-option.selected'); const newSettings = { wallpaperUrl: selectedWallpaper ? selectedWallpaper.dataset.url : currentSettings.wallpaperUrl, welcomeMessage: welcomeMessageInput.value || currentSettings.welcomeMessage, }; const db = getFirestore(); const settingsRef = doc(db, `/artifacts/${appId}/public/data/settings`, 'website_config'); try { await setDoc(settingsRef, newSettings); document.getElementById('personalize-window').classList.add('hidden');} catch (e) { console.error("Error saving settings:", e); alert("Could not save settings."); }}
 
         // Start everything
         initFirebase();
