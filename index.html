@@ -3,206 +3,66 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Our Minecraft Server!</title>
+    <title>Minecraft Server Desktop</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
-    <style>
-        body {
-            font-family: 'Inter', sans-serif;
-            background-image: url('https://i.postimg.cc/k4D2k3Qx/frutiger-aero-background.jpg');
-            background-size: cover;
-            background-position: center;
-            background-attachment: fixed;
-            cursor: none; /* Hide default cursor for loupe effect */
-        }
-        .header-nav a.active { color: #2563eb; font-weight: 700; }
-        .header-nav a:hover { color: #3b82f6; }
-        .spinner { border-top-color: #3b82f6; animation: spin 1s linear infinite; }
-        @keyframes spin { to { transform: rotate(30deg); } }
-        .aero-panel {
-            background-color: rgba(255, 255, 255, 0.7);
-            backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
-        }
-        .glossy-button {
-            background-image: linear-gradient(to bottom, #60a5fa, #3b82f6);
-            border: 1px solid #2563eb;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.1), inset 0 1px 1px rgba(255,255,255,0.4);
-        }
-        .glossy-button:hover { background-image: linear-gradient(to bottom, #3b82f6, #2563eb); }
-        
-        /* --- New Droplet and Loupe Styles --- */
-        .with-droplets { position: relative; overflow: hidden; }
-        .droplet {
-            position: absolute;
-            background: linear-gradient(135deg, rgba(255,255,255,0.8), rgba(255,255,255,0.3));
-            border-radius: 50%;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.2), inset 0 1px 1px rgba(255,255,255,0.5);
-        }
-        .droplet.d1 { width: 30px; height: 30px; top: 15%; left: 10%; }
-        .droplet.d2 { width: 15px; height: 15px; top: 20%; left: 85%; }
-        .droplet.d3 { width: 20px; height: 20px; top: 70%; left: 5%; }
-        .droplet.d4 { width: 25px; height: 25px; top: 80%; left: 90%; opacity: 0.8; }
-        .droplet.d5 { width: 18px; height: 18px; top: 40%; left: 50%; }
-        
-
-        .mouse-loupe {
-            position: fixed;
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-            border: 3px solid rgba(255, 255, 255, 0.8);
-            box-shadow: 0 0 20px rgba(59, 130, 246, 0.7), inset 0 0 10px rgba(255, 255, 255, 0.5);
-            pointer-events: none; /* Allows clicking through the loupe */
-            transform: translate(-50%, -50%); /* Center on cursor */
-            transition: width 0.2s, height 0.2s;
-            z-index: 9999;
-            backdrop-filter: brightness(1.1);
-            -webkit-backdrop-filter: brightness(1.1);
-        }
-    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Segoe+UI:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
 </head>
-<body class="min-h-screen text-slate-800">
+<body class="h-screen w-screen">
 
-    <header class="aero-panel sticky top-0 z-10">
-        <nav class="container mx-auto px-6 py-4 flex justify-center items-center">
-            <div class="header-nav flex space-x-8 text-lg font-medium text-slate-600">
-                <a href="index.html" class="py-1 transition-colors duration-200 active">Home</a>
-                <a href="mods.html" class="py-1 transition-colors duration-200">Mod List</a>
+    <main id="desktop" class="h-full w-full relative">
+        <!-- Desktop Icons -->
+        <div class="desktop-icon" data-opens="welcome-window" style="top: 20px; left: 20px;">
+            <img src="https://i.postimg.cc/L6R7z8c3/server-icon.png" alt="Server Info Icon">
+            <span>Server Info</span>
+        </div>
+        <div class="desktop-icon" data-opens="mods-window" style="top: 120px; left: 20px;">
+            <img src="https://i.postimg.cc/pT3wL9Vj/mods-icon.png" alt="Mod List Icon">
+            <span>Mod List</span>
+        </div>
+        <div class="desktop-icon" data-opens="personalize-window" style="top: 220px; left: 20px;">
+            <img src="https://i.postimg.cc/q7bH7zN3/personalize-icon.png" alt="Personalize Icon">
+            <span>Personalize</span>
+        </div>
+
+        <!-- Welcome Window -->
+        <div id="welcome-window" class="win7-window w-full max-w-lg" style="top: 50px; left: 150px; z-index: 2;">
+            <div class="win7-title-bar flex justify-between items-center"><span class="font-bold text-sm text-black">Welcome to the Server</span><div class="win7-controls flex space-x-1"><button class="bg-gray-200 hover:bg-gray-300 text-black text-xs">_</button><button class="bg-gray-200 hover:bg-gray-300 text-black text-xs">[]</button><button class="close-btn bg-gray-200 close text-black" data-closes="welcome-window">X</button></div></div>
+            <div class="win7-content p-6 text-black">
+                <p id="welcome-message" class="mb-6">Loading welcome message...</p>
+                <hr class="border-gray-300 my-6">
+                <h2 class="text-xl font-bold mb-4">Screenshot Viewer</h2>
+                <div id="screenshot-gallery" class="grid grid-cols-2 md:grid-cols-3 gap-4 bg-white p-4 border border-gray-400 rounded max-h-80 overflow-y-auto"></div>
             </div>
-        </nav>
-    </header>
+        </div>
 
-    <main class="container mx-auto px-6 py-12">
-        <div class="text-center mb-16">
-            <h1 class="text-5xl md:text-6xl font-bold tracking-tight text-slate-900 mb-4">Welcome to Our Server!</h1>
-            <p class="text-xl md:text-2xl text-blue-600 font-medium">Let's build some cool stuff.</p>
+        <!-- Mods Window -->
+        <div id="mods-window" class="win7-window w-full max-w-4xl h-[70vh] hidden" style="top: 100px; left: 250px; z-index: 1;">
+            <div class="win7-title-bar flex justify-between items-center"><span class="font-bold text-sm text-black">Mod List</span><div class="win7-controls flex space-x-1"><button class="bg-gray-200 hover:bg-gray-300 text-black text-xs">_</button><button class="bg-gray-200 hover:bg-gray-300 text-black text-xs">[]</button><button class="close-btn bg-gray-200 close text-black" data-closes="mods-window">X</button></div></div>
+            <div class="win7-content p-4 text-black overflow-y-auto">
+                <div id="mod-list-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2"></div>
+            </div>
         </div>
         
-        <!-- Added 'with-droplets' class here -->
-        <div class="aero-panel with-droplets rounded-xl max-w-4xl mx-auto p-8 space-y-6 text-lg">
-            <div class="droplet d1"></div><div class="droplet d2"></div><div class="droplet d3"></div><div class="droplet d4"></div><div class="droplet d5"></div>
-            <p>Hey everyone! Welcome to the homepage for our new modded server. This pack is all about building awesome factories with <strong>Create</strong>, becoming master chefs with <strong>Farmer's Delight</strong>, and finally having enough inventory space thanks to the <strong>Sophisticated</strong> mods.</p>
-            <p>I've also added <strong>Expanded Ecosphere</strong> to make the world look amazing, and the <strong>Dungeons and Taverns</strong> mods so we have some cool places to explore together. It should be a pretty stable and fun world to hang out in. Can't wait to see what you all build!</p>
-            <div class="text-center pt-8">
-                 <a href="mods.html" class="glossy-button text-white font-bold py-3 px-8 rounded-full text-lg transition duration-200 inline-block transform hover:scale-105">See the Full Mod List</a>
+        <!-- Personalize Window -->
+        <div id="personalize-window" class="win7-window w-full max-w-2xl hidden" style="top: 150px; left: 350px; z-index: 1;">
+            <div class="win7-title-bar flex justify-between items-center"><span class="font-bold text-sm text-black">Personalization</span><div class="win7-controls flex space-x-1"><button class="close-btn bg-gray-200 close text-black" data-closes="personalize-window">X</button></div></div>
+            <div class="win7-content p-6 text-black">
+                <h3 class="font-bold text-lg mb-4">Change Desktop Background</h3>
+                <div id="wallpaper-options" class="grid grid-cols-4 gap-4 mb-6"></div>
+                <h3 class="font-bold text-lg mb-4">Edit Welcome Message</h3>
+                <textarea id="welcome-message-input" class="w-full bg-white border border-gray-400 rounded p-1 text-sm h-24"></textarea>
+                <div class="flex justify-end mt-6"><button id="save-settings-btn" class="win7-button px-6 py-1.5 font-bold">Save Changes</button></div>
             </div>
         </div>
 
-        <!-- Gemini Features Section -->
-        <div class="mt-24 max-w-5xl mx-auto">
-             <h2 class="text-4xl font-bold text-center mb-12 text-slate-900">Need an Idea?</h2>
-             <div class="grid md:grid-cols-2 gap-8">
-                <div class="aero-panel rounded-xl p-6 flex flex-col">
-                    <h3 class="text-2xl font-bold text-blue-600 mb-4">Let's Make Up Some Lore</h3>
-                    <p class="text-slate-600 mb-4 flex-grow">Click the button to get a silly, random backstory for our world.</p>
-                    <button id="generate-backstory-btn" class="w-full glossy-button text-white font-bold py-2 px-4 rounded-md transition duration-200 flex items-center justify-center space-x-2">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 3L8 21m-4-9h16m-4-7l2.5 2.5M14 3l-2.5 2.5"/></svg>
-                        <span>Tell Me a Story</span>
-                    </button>
-                    <div id="backstory-loading" class="hidden justify-center items-center mt-4"><div class="spinner w-8 h-8 rounded-full border-4 border-gray-300"></div></div>
-                    <div id="backstory-response" class="bg-white/50 mt-4 p-4 rounded-lg text-slate-700 hidden border border-white/30"></div>
-                </div>
-                <div class="aero-panel rounded-xl p-6 flex flex-col">
-                     <h3 class="text-2xl font-bold text-blue-600 mb-4">What Should I Do Now?</h3>
-                    <p class="text-slate-600 mb-4 flex-grow">Tell me what you've been up to and I'll give you some ideas.</p>
-                    <textarea id="advisor-input" class="w-full bg-white/60 border border-slate-300 rounded-md p-2 mb-4 text-slate-800 placeholder-slate-500 focus:ring-2 focus:ring-blue-500 outline-none transition" rows="3" placeholder="e.g., I just finished my hobbit hole..."></textarea>
-                    <button id="get-advice-btn" class="w-full glossy-button text-white font-bold py-2 px-4 rounded-md transition duration-200 flex items-center justify-center space-x-2">
-                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 16.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm1-5.5h-2v-6h2v6z"/></svg>
-                         <span>Give Me a Quest</span>
-                    </button>
-                    <div id="advisor-loading" class="hidden justify-center items-center mt-4"><div class="spinner w-8 h-8 rounded-full border-4 border-gray-300"></div></div>
-                    <div id="advisor-response" class="bg-white/50 mt-4 p-4 rounded-lg text-slate-700 hidden border border-white/30"></div>
-                </div>
-             </div>
+        <!-- Image Viewer Window -->
+        <div id="image-viewer-window" class="win7-window w-auto max-w-4xl hidden" style="top: 20%; left: 20%; z-index: 10;">
+             <div class="win7-title-bar flex justify-between items-center"><span id="image-title" class="font-bold text-sm text-black">Windows Photo Viewer</span><div class="win7-controls flex space-x-1"><button class="close-btn bg-gray-200 close text-black" data-closes="image-viewer-window">X</button></div></div>
+            <div class="win7-content p-2"><img id="full-size-image" src="" alt="Full-size screenshot" class="max-w-[80vw] max-h-[70vh]"></div>
         </div>
     </main>
 
-    <footer class="aero-panel mt-16">
-        <div class="container mx-auto px-6 py-4 text-center text-slate-600">
-            <p>Our little corner of the internet. Have fun!</p>
-        </div>
-    </footer>
-
-    <!-- Mouse Loupe Element -->
-    <div class="mouse-loupe"></div>
-
-    <script type="module">
-        // --- New Loupe Logic ---
-        const loupe = document.querySelector('.mouse-loupe');
-        window.addEventListener('mousemove', (e) => {
-            loupe.style.left = `${e.clientX}px`;
-            loupe.style.top = `${e.clientY}px`;
-        });
-        document.addEventListener('mousedown', () => {
-            loupe.style.width = '70px';
-            loupe.style.height = '70px';
-        });
-        document.addEventListener('mouseup', () => {
-            loupe.style.width = '80px';
-            loupe.style.height = '80px';
-        });
-
-        // --- Existing Gemini Logic ---
-        const generateBackstoryBtn = document.getElementById('generate-backstory-btn');
-        const backstoryResponseEl = document.getElementById('backstory-response');
-        const backstoryLoadingEl = document.getElementById('backstory-loading');
-        // ... (rest of the Gemini JS is unchanged)
-        const getAdviceBtn = document.getElementById('get-advice-btn');
-        const advisorInput = document.getElementById('advisor-input');
-        const advisorResponseEl = document.getElementById('advisor-response');
-        const advisorLoadingEl = document.getElementById('advisor-loading');
-        const apiKey = "";
-        const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
-        
-        async function callGemini(payload, responseElement, loadingElement, buttonElement) {
-            loadingElement.classList.remove('hidden');
-            responseElement.classList.add('hidden');
-            buttonElement.disabled = true;
-            let retries = 3;
-            let delay = 1000;
-            while (retries > 0) {
-                try {
-                    const response = await fetch(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
-                    if (!response.ok) { throw new Error(`HTTP error! status: ${response.status}`); }
-                    const result = await response.json();
-                    const candidate = result.candidates?.[0];
-                    if (candidate && candidate.content?.parts?.[0]?.text) {
-                        responseElement.textContent = candidate.content.parts[0].text;
-                        responseElement.classList.remove('hidden');
-                    } else {
-                        responseElement.textContent = 'Whoops, the AI is sleeping. Try again in a bit.';
-                        responseElement.classList.remove('hidden');
-                    }
-                    return;
-                } catch (error) {
-                    console.error('API Call failed:', error);
-                    retries--;
-                    if (retries === 0) { responseElement.textContent = 'Error: The request failed. Tell the server owner the AI is broken!'; responseElement.classList.remove('hidden'); }
-                    await new Promise(res => setTimeout(res, delay));
-                    delay *= 2;
-                } finally {
-                    loadingElement.classList.add('hidden');
-                    buttonElement.disabled = false;
-                }
-            }
-        }
-        generateBackstoryBtn.addEventListener('click', async () => {
-            const systemPrompt = "You are a fun and creative friend on a Minecraft server. Your task is to write a short, fun, and slightly silly backstory for our shared Minecraft world. The story should be 2-3 paragraphs long and set up a fun adventure for a group of friends. It should hint at the kinds of things we can do with our mods without naming them: themes of building crazy contraptions (Create), cooking up big feasts (Farmer's Delight), exploring cool new places (Ecosphere, Dungeons), and having awesome gear (Sophisticated). Keep the tone light and exciting!";
-            const userQuery = `Tell us a fun backstory for our new Minecraft server!`;
-            const payload = { contents: [{ parts: [{ text: userQuery }] }], systemInstruction: { parts: [{ text: systemPrompt }] }, };
-            callGemini(payload, backstoryResponseEl, backstoryLoadingEl, generateBackstoryBtn);
-        });
-        getAdviceBtn.addEventListener('click', async () => {
-            const userInput = advisorInput.value.trim();
-            if (!userInput) { advisorResponseEl.textContent = "You gotta tell me what you've done first!"; advisorResponseEl.classList.remove('hidden'); return; }
-            const systemPrompt = `You are a helpful and enthusiastic friend on a modded Minecraft server. You know all about the mods we're using. Your job is to give 3 fun and creative ideas for what someone should do next, based on what they've told you. Talk directly to the person like a friend (use "You could..." or "What if you..."). Encourage them to use the mods and maybe even suggest projects they could do with other people on the server. Your tone should be encouraging and fun, not bossy.`;
-            const userQuery = `I'm playing on our server. So far, I've done this: "${userInput}". What are some fun ideas for what I should do next?`;
-            const payload = { contents: [{ parts: [{ text: userQuery }] }], systemInstruction: { parts: [{ text: systemPrompt }] }, };
-            callGemini(payload, advisorResponseEl, advisorLoadingEl, getAdviceBtn);
-        });
-    </script>
+    <script type="module" src="js/main.js"></script>
 </body>
 </html>
-
