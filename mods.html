@@ -3,67 +3,105 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The Mod List</title>
+    <title>Mod List</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Segoe+UI:wght@400;700&display=swap" rel="stylesheet">
     <style>
         body {
-            font-family: 'Inter', sans-serif;
-            background-color: #1a1a1a;
-            color: #e0e0e0;
+            font-family: 'Segoe UI', sans-serif;
+            background-image: url('https://i.postimg.cc/W1V6yC1g/windows-7-wallpaper.jpg');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            overflow: hidden;
         }
-        .header-nav a {
-            transition: color 0.3s, border-bottom-color 0.3s;
+        .win7-window {
+            box-shadow: 0 5px 25px rgba(0,0,0,0.2);
+            border: 1px solid #707070;
+            border-radius: 6px;
         }
-        .header-nav a.active {
-            color: #818cf8; /* Indigo-400 */
-            border-bottom-color: #818cf8;
+        .win7-title-bar {
+            background: linear-gradient(to bottom, rgba(240, 240, 240, 0.9), rgba(200, 200, 200, 0.8));
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border-bottom: 1px solid #a0a0a0;
+            padding: 5px 8px;
+            border-top-left-radius: 5px;
+            border-top-right-radius: 5px;
         }
-         .header-nav a:hover {
-            color: #a78bfa; /* Violet-400 */
+        .win7-content {
+            background-color: #FFFFFF;
+            border-bottom-left-radius: 5px;
+            border-bottom-right-radius: 5px;
         }
-        .mod-item {
-             background-color: #2a2a2a;
-             border: 1px solid #3a3a3a;
-             transition: transform 0.2s, box-shadow 0.2s;
+        .win7-controls button {
+            width: 20px; height: 20px; border: 1px solid #a0a0a0;
+            font-weight: bold; font-family: 'Courier New', Courier, monospace;
+            line-height: 18px;
         }
-        .mod-item:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        .win7-controls .close:hover { background-color: #e81123; color: white; }
+        .win7-taskbar {
+            background: linear-gradient(to bottom, rgba(0,0,0,0.7), rgba(0,0,0,0.8));
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border-top: 1px solid rgba(255,255,255,0.3);
+        }
+        #start-menu {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border: 1px solid #a0a0a0;
         }
     </style>
 </head>
-<body class="min-h-screen flex flex-col">
+<body class="h-screen flex flex-col">
 
-    <header class="bg-[#2a2a2a]/80 backdrop-blur-sm sticky top-0 z-10 border-b border-[#3a3a3a]">
-        <nav class="container mx-auto px-6 py-4 flex justify-center items-center">
-            <div class="header-nav flex space-x-8 text-lg">
-                <a href="index.html" class="py-1 border-b-2 border-transparent">Home</a>
-                <a href="mods.html" class="py-1 border-b-2 border-transparent active">Mod List</a>
+    <!-- Desktop Area -->
+    <main class="flex-grow p-4 md:p-8 flex items-start justify-center">
+        <div class="win7-window w-full max-w-6xl">
+            <!-- Title Bar -->
+            <div class="win7-title-bar flex justify-between items-center">
+                <span class="font-bold text-sm text-black">Mod List</span>
+                <div class="win7-controls flex space-x-1">
+                    <button class="bg-gray-200 hover:bg-gray-300 text-black text-xs">_</button>
+                    <button class="bg-gray-200 hover:bg-gray-300 text-black text-xs">[]</button>
+                    <button class="bg-gray-200 close text-black">X</button>
+                </div>
             </div>
-        </nav>
-    </header>
-
-    <main class="flex-grow">
-        <div class="container mx-auto px-6 py-12">
-            <div class="text-center mb-12">
-                <h1 class="text-5xl font-bold tracking-tight text-white">Here's All The Mods</h1>
-                <p class="text-xl text-indigo-300 mt-2">Just in case you were curious what's running under the hood.</p>
-            </div>
-            
-            <div id="mod-list-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                <!-- Mod list will be dynamically inserted here -->
+            <!-- Window Content -->
+            <div class="win7-content p-4 text-black h-[75vh] overflow-y-auto">
+                <div id="mod-list-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
+                    <!-- Mod list will be dynamically inserted here -->
+                </div>
             </div>
         </div>
     </main>
-    
-    <footer class="bg-[#2a2a2a] border-t border-[#3a3a3a] mt-16">
-        <div class="container mx-auto px-6 py-4 text-center text-gray-400">
-            <p>Our little corner of the internet. Have fun!</p>
+
+    <!-- Taskbar -->
+    <footer class="win7-taskbar w-full h-10 flex items-center px-2 relative">
+        <!-- Start Button -->
+        <button id="start-btn" class="w-10 h-10 bg-center bg-no-repeat bg-cover rounded-full" style="background-image: url('https://i.postimg.cc/1XyJc72S/win7-start-orb.png');"></button>
+        
+        <!-- Start Menu -->
+        <div id="start-menu" class="absolute bottom-12 left-2 w-64 rounded-lg shadow-lg hidden">
+            <a href="index.html" class="block px-4 py-2 text-black hover:bg-blue-300 rounded-t-lg">Home</a>
+            <a href="mods.html" class="block px-4 py-2 text-black hover:bg-blue-300 rounded-b-lg">Mod List</a>
         </div>
     </footer>
 
     <script>
+        // Start Menu Logic
+        const startBtn = document.getElementById('start-btn');
+        const startMenu = document.getElementById('start-menu');
+        startBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            startMenu.classList.toggle('hidden');
+        });
+        document.addEventListener('click', () => {
+            startMenu.classList.add('hidden');
+        });
+
+        // Mod List Logic
         const mods = [
             { name: "AI-Improvements", author: "BuiltBrokenModding", url: "https://modrinth.com/mod/DSVgwcji" },
             { name: "AppleSkin", author: "squeek", url: "https://modrinth.com/mod/EsAfCjCV" },
@@ -108,7 +146,7 @@
             { name: "Model Gap Fix", author: "MehVahdJukaar", url: "https://modrinth.com/mod/QdG47OkI" },
             { name: "ModernFix", author: "embeddedt", url: "https://modrinth.com/mod/nmDcB62a" },
             { name: "More Culling", author: "FX - PR0CESS, 1Foxy2", url: "https://modrinth.com/mod/51shyZVL" },
-            { name: "Mouse Tweaks", author: "Ivan Molodetskikh (YaLTeR)", url: "https://modrinth.com/mod/aC3cM3Vq" },
+            { name: "Mouse Tweks", author: "Ivan Molodetskikh (YaLTeR)", url: "https://modrinth.com/mod/aC3cM3Vq" },
             { name: "Noisium", author: "Steveplays28", url: "https://modrinth.com/mod/KuNKN7d2" },
             { name: "Particle Rain", author: "PigCart", url: "https://modrinth.com/mod/nrikgvxm" },
             { name: "Polytone", author: "MehVahdJukaar", url: "https://modrinth.com/mod/3qAYkBMB" },
@@ -134,17 +172,15 @@
             modElement.href = mod.url;
             modElement.target = '_blank';
             modElement.rel = 'noopener noreferrer';
-            modElement.className = 'mod-item block p-6 rounded-lg';
+            modElement.className = 'block p-3 hover:bg-blue-200 rounded';
             
             modElement.innerHTML = `
-                <h3 class="text-xl font-bold text-indigo-300">${mod.name}</h3>
-                <p class="text-gray-400">by ${mod.author}</p>
+                <h3 class="font-bold text-black">${mod.name}</h3>
+                <p class="text-sm text-gray-600">by ${mod.author}</p>
             `;
             
             container.appendChild(modElement);
         });
     </script>
-
 </body>
 </html>
-
