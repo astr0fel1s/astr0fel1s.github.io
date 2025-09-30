@@ -14,8 +14,8 @@ import { mods } from "./mods.js";
 import { screenshots } from "./screenshots.js";
 
 // --- CONFIGURATION ---
-const GITHUB_USERNAME = "YOUR_USERNAME";
-const GITHUB_REPONAME = "YOUR_REPONAME";
+const GITHUB_USERNAME = "astr0fel1s";
+const GITHUB_REPONAME = "astr0fel1s.github.io";
 
 // --- Draggable Elements & Window Management ---
 let highestZ = 10;
