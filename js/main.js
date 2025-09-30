@@ -1,21 +1,32 @@
-import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-app.js";
 import {
   getAuth,
   signInAnonymously,
-  signInWithCustomToken,
-} from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+} from "https://www.gstatic.com/firebasejs/12.3.0/firebase-auth.js";
 import {
   getFirestore,
   doc,
   onSnapshot,
   setDoc,
-} from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+} from "https://www.gstatic.com/firebasejs/12.3.0/firebase-firestore.js";
 import { mods } from "./mods.js";
 import { screenshots } from "./screenshots.js";
 
 // --- CONFIGURATION ---
+// IMPORTANT: Replace these values with your GitHub username and repository name.
 const GITHUB_USERNAME = "astr0fel1s";
 const GITHUB_REPONAME = "astr0fel1s.github.io";
+
+// Your web app's Firebase configuration - CORRECTED
+const firebaseConfig = {
+  apiKey: "AIzaSyB6aCTghxMMYk4Zu4FretxDHPPrIOnld4Y",
+  authDomain: "astr0fel1s.firebaseapp.com",
+  projectId: "astr0fel1s",
+  storageBucket: "astr0fel1s.appspot.com", // CORRECTED VALUE
+  messagingSenderId: "372314303481",
+  appId: "1:372314303481:web:9024e9628a8ff341ed2b28",
+  measurementId: "G-89WY6FTKTX",
+};
 
 // --- Draggable Elements & Window Management ---
 let highestZ = 10;
@@ -144,7 +155,6 @@ document.querySelectorAll(".desktop-icon").forEach((icon) => {
       windowEl.classList.remove("hidden");
       highestZ++;
       windowEl.style.zIndex = highestZ;
-      // If it was minimized, remove taskbar button
       document
         .querySelector(`.taskbar-btn[data-window-id="${windowId}"]`)
         ?.remove();
@@ -184,14 +194,12 @@ document.querySelectorAll(".win7-window").forEach((windowEl) => {
   if (maximizeBtn) {
     maximizeBtn.addEventListener("click", () => {
       if (windowEl.classList.contains("is-maximized")) {
-        // Restore
         windowEl.style.top = windowEl.dataset.originalTop;
         windowEl.style.left = windowEl.dataset.originalLeft;
         windowEl.style.width = windowEl.dataset.originalWidth;
         windowEl.style.height = windowEl.dataset.originalHeight;
         windowEl.classList.remove("is-maximized");
       } else {
-        // Maximize
         const rect = windowEl.getBoundingClientRect();
         const desktopRect = document
           .getElementById("desktop")
@@ -230,10 +238,8 @@ function updateClock() {
 setInterval(updateClock, 1000);
 updateClock();
 
-// --- Firebase & Personalization (Unchanged) ---
-const firebaseConfig =
-  typeof __firebase_config !== "undefined" ? JSON.parse(__firebase_config) : {};
-const appId = typeof __app_id !== "undefined" ? __app_id : "default-app-id";
+// --- Firebase & Personalization ---
+const appId = firebaseConfig.appId;
 const welcomeMessageEl = document.getElementById("welcome-message");
 const welcomeMessageInput = document.getElementById("welcome-message-input");
 const wallpaperOptionsContainer = document.getElementById("wallpaper-options");
@@ -242,31 +248,23 @@ let auth;
 let currentSettings = {};
 let selectedWallpaperUrlForSave = "";
 let dynamicWallpapers = [];
+
 async function initFirebase() {
-  if (!Object.keys(firebaseConfig).length) {
-    console.warn(
-      "Firebase config not found. Personalization will not persist.",
-    );
-    applySettings({
-      welcomeMessage:
-        "Welcome! Personalization is offline. Set up Firebase to enable.",
-    });
-    return;
-  }
   try {
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
     auth = getAuth(app);
-    if (typeof __initial_auth_token !== "undefined") {
-      await signInWithCustomToken(auth, __initial_auth_token);
-    } else {
-      await signInAnonymously(auth);
-    }
+    await signInAnonymously(auth);
     listenForSettings(db, appId);
   } catch (e) {
     console.error("Firebase initialization error:", e);
+    applySettings({
+      welcomeMessage:
+        "Error connecting to Firebase. Personalization is offline.",
+    });
   }
 }
+
 function applySettings(settings) {
   currentSettings = settings;
   if (settings.wallpaperUrl) {
@@ -276,6 +274,7 @@ function applySettings(settings) {
     welcomeMessageEl.textContent = settings.welcomeMessage;
   }
 }
+
 function listenForSettings(db, appId) {
   const settingsRef = doc(
     db,
@@ -290,16 +289,17 @@ function listenForSettings(db, appId) {
         wallpaperUrl:
           dynamicWallpapers.length > 0
             ? dynamicWallpapers[0].url
-            : "img/wallpapers/1 rain_world.png",
+            : "https://i.postimg.cc/W1V6yC1g/windows-7-wallpaper.jpg",
         welcomeMessage: "Welcome! Double-click 'Personalize' to customize.",
       });
     }
   });
 }
+
 async function fetchWallpapersFromGitHub() {
   if (
-    GITHUB_USERNAME === "astr0fel1s" ||
-    GITHUB_REPONAME === "astr0fel1s.github.io"
+    GITHUB_USERNAME === "YOUR_USERNAME" ||
+    GITHUB_REPONAME === "YOUR_REPONAME"
   ) {
     console.warn(
       "GitHub username/repo not set. Cannot fetch dynamic wallpapers.",
@@ -308,6 +308,7 @@ async function fetchWallpapersFromGitHub() {
   }
   const apiUrl = `https://api.github.com/repos/${GITHUB_USERNAME}/${GITHUB_REPONAME}/contents/images/wallpapers`;
   const thumbsUrl = `https://api.github.com/repos/${GITHUB_USERNAME}/${GITHUB_REPONAME}/contents/images/wallpapers/thumbs`;
+
   try {
     const [wallpapersRes, thumbsRes] = await Promise.all([
       fetch(apiUrl),
@@ -315,11 +316,14 @@ async function fetchWallpapersFromGitHub() {
     ]);
     if (!wallpapersRes.ok || !thumbsRes.ok)
       throw new Error("Failed to fetch from GitHub API");
+
     const wallpapersData = await wallpapersRes.json();
     const thumbsData = await thumbsRes.json();
+
     const thumbMap = new Map(
       thumbsData.map((thumb) => [thumb.name, thumb.download_url]),
     );
+
     return wallpapersData
       .filter((file) => file.type === "file" && thumbMap.has(file.name))
       .map((file) => ({
@@ -332,9 +336,11 @@ async function fetchWallpapersFromGitHub() {
     return [];
   }
 }
+
 function openPersonalizeModal() {
   welcomeMessageInput.value = currentSettings.welcomeMessage || "";
   selectedWallpaperUrlForSave = currentSettings.wallpaperUrl || "";
+
   wallpaperOptionsContainer.innerHTML = "";
   dynamicWallpapers.forEach((wp) => {
     const option = document.createElement("img");
@@ -353,11 +359,8 @@ function openPersonalizeModal() {
     wallpaperOptionsContainer.appendChild(option);
   });
 }
+
 async function saveSettings() {
-  if (!Object.keys(firebaseConfig).length) {
-    alert("Cannot save settings. Firebase is not configured.");
-    return;
-  }
   const newSettings = {
     wallpaperUrl: selectedWallpaperUrlForSave,
     welcomeMessage: welcomeMessageInput.value || currentSettings.welcomeMessage,
@@ -378,7 +381,7 @@ async function saveSettings() {
 }
 saveSettingsBtn.addEventListener("click", saveSettings);
 
-// --- Screenshot Viewer (Unchanged) ---
+// --- Screenshot Viewer ---
 const gallery = document.getElementById("screenshot-gallery");
 const viewerWindow = document.getElementById("image-viewer-window");
 const fullSizeImage = document.getElementById("full-size-image");
@@ -398,7 +401,7 @@ screenshots.forEach((screenshot) => {
   gallery.appendChild(thumbDiv);
 });
 
-// --- Mod List Generation (Unchanged) ---
+// --- Mod List Generation ---
 const modListContainer = document.getElementById("mod-list-container");
 mods
   .sort((a, b) => a.name.localeCompare(b.name))
@@ -417,4 +420,5 @@ async function initializeDesktop() {
   dynamicWallpapers = await fetchWallpapersFromGitHub();
   await initFirebase();
 }
+
 initializeDesktop();
