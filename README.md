@@ -16,10 +16,3 @@ About the Modpack
 🌐 Live Website
 
 The live, multi-page website for this modpack is hosted using GitHub Pages.
-
-Visit the Live Website
-
-(Note: Remember to replace your-username and your-repository-name with your actual GitHub details in this link!)
-About this Repository
-
-The files in this repository (index.html, mods.html) are the static web pages that make up the site. GitHub Pages is configured to serve the content directly from the main branch.
