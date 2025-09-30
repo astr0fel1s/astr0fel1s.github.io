@@ -53,9 +53,6 @@
         .win7-button:hover {
             border-color: #3b82f6; background: linear-gradient(to bottom, #eaf5ff, #c4e0ff);
         }
-        .modal-backdrop {
-            background-color: rgba(0,0,0,0.5); backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px);
-        }
         .wallpaper-option {
             border: 2px solid transparent; cursor: pointer;
         }
@@ -108,7 +105,7 @@
         </div>
 
         <!-- Welcome Window -->
-        <div id="welcome-window" class="win7-window w-full max-w-lg" style="top: 50px; left: 150px;">
+        <div id="welcome-window" class="win7-window w-full max-w-lg" style="top: 50px; left: 150px; z-index: 2;">
             <div class="win7-title-bar flex justify-between items-center"><span class="font-bold text-sm text-black">Welcome to the Server</span><div class="win7-controls flex space-x-1"><button class="bg-gray-200 hover:bg-gray-300 text-black text-xs">_</button><button class="bg-gray-200 hover:bg-gray-300 text-black text-xs">[]</button><button class="close-btn bg-gray-200 close text-black" data-closes="welcome-window">X</button></div></div>
             <div class="win7-content p-6 text-black">
                 <p id="welcome-message" class="mb-6">Hey everyone! Welcome to the homepage for our new modded server. Use this site to check out the mod list and see screenshots from our world. Have fun!</p>
@@ -119,7 +116,7 @@
         </div>
 
         <!-- Mods Window -->
-        <div id="mods-window" class="win7-window w-full max-w-4xl h-[70vh] hidden" style="top: 100px; left: 250px;">
+        <div id="mods-window" class="win7-window w-full max-w-4xl h-[70vh] hidden" style="top: 100px; left: 250px; z-index: 1;">
             <div class="win7-title-bar flex justify-between items-center"><span class="font-bold text-sm text-black">Mod List</span><div class="win7-controls flex space-x-1"><button class="bg-gray-200 hover:bg-gray-300 text-black text-xs">_</button><button class="bg-gray-200 hover:bg-gray-300 text-black text-xs">[]</button><button class="close-btn bg-gray-200 close text-black" data-closes="mods-window">X</button></div></div>
             <div class="win7-content p-4 text-black overflow-y-auto">
                 <div id="mod-list-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2"></div>
@@ -127,7 +124,7 @@
         </div>
         
         <!-- Personalize Window -->
-        <div id="personalize-window" class="win7-window w-full max-w-2xl hidden" style="top: 150px; left: 350px;">
+        <div id="personalize-window" class="win7-window w-full max-w-2xl hidden" style="top: 150px; left: 350px; z-index: 1;">
             <div class="win7-title-bar flex justify-between items-center"><span class="font-bold text-sm text-black">Personalization</span><div class="win7-controls flex space-x-1"><button class="close-btn bg-gray-200 close text-black" data-closes="personalize-window">X</button></div></div>
             <div class="win7-content p-6 text-black">
                 <h3 class="font-bold text-lg mb-4">Change Desktop Background</h3>
@@ -139,7 +136,7 @@
         </div>
 
         <!-- Image Viewer Window -->
-        <div id="image-viewer-window" class="win7-window w-auto max-w-4xl hidden" style="top: 20%; left: 20%;">
+        <div id="image-viewer-window" class="win7-window w-auto max-w-4xl hidden" style="top: 20%; left: 20%; z-index: 10;">
              <div class="win7-title-bar flex justify-between items-center"><span id="image-title" class="font-bold text-sm text-black">Windows Photo Viewer</span><div class="win7-controls flex space-x-1"><button class="close-btn bg-gray-200 close text-black" data-closes="image-viewer-window">X</button></div></div>
             <div class="win7-content p-2"><img id="full-size-image" src="" alt="Full-size screenshot" class="max-w-[80vw] max-h-[70vh]"></div>
         </div>
@@ -152,6 +149,7 @@
 
         // --- Draggable Elements & Window Management ---
         let highestZ = 10;
+        const GRID_SIZE = 20; // Snap icons to a 20x20 grid
         
         function makeDraggable(element, handle) {
             let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
@@ -164,7 +162,6 @@
                 document.onmouseup = closeDragElement;
                 document.onmousemove = elementDrag;
 
-                // Bring window to front
                 if (element.classList.contains('win7-window')) {
                     highestZ++;
                     element.style.zIndex = highestZ;
@@ -180,8 +177,17 @@
                 pos2 = pos4 - e.clientY;
                 pos3 = e.clientX;
                 pos4 = e.clientY;
-                element.style.top = (element.offsetTop - pos2) + "px";
-                element.style.left = (element.offsetLeft - pos1) + "px";
+
+                let newTop = element.offsetTop - pos2;
+                let newLeft = element.offsetLeft - pos1;
+
+                if (element.classList.contains('desktop-icon')) {
+                    newTop = Math.round(newTop / GRID_SIZE) * GRID_SIZE;
+                    newLeft = Math.round(newLeft / GRID_SIZE) * GRID_SIZE;
+                }
+
+                element.style.top = newTop + "px";
+                element.style.left = newLeft + "px";
             };
 
             const closeDragElement = () => {
@@ -202,6 +208,10 @@
                     windowEl.classList.remove('hidden');
                     highestZ++;
                     windowEl.style.zIndex = highestZ;
+                    // Special handler for personalize window
+                    if(windowId === 'personalize-window') {
+                        openPersonalizeModal();
+                    }
                 }
             });
         });
@@ -222,7 +232,8 @@
         const saveSettingsBtn = document.getElementById('save-settings-btn');
         let auth;
         let currentSettings = {};
-        
+        let selectedWallpaperUrlForSave = '';
+
         const wallpapers = [
             { name: 'Windows 7', url: 'https://i.imgur.com/mp91bQE.jpeg', thumb: 'https://i.imgur.com/mp91bQE.jpeg' },
             { name: 'Bliss', url: 'https://i.postimg.cc/3JcWWzmp/bliss.jpg', thumb: 'https://i.postimg.cc/zX3rNtjM/bliss-thumb.jpg' },
@@ -231,8 +242,9 @@
         ];
         
         async function initFirebase() {
-            if (!firebaseConfig.apiKey) {
+            if (!Object.keys(firebaseConfig).length) {
                 console.warn("Firebase config not found. Personalization will not persist.");
+                applySettings({ wallpaperUrl: wallpapers[0].url, welcomeMessage: "Welcome! Personalization is offline. Set up Firebase to enable." });
                 return;
             } 
             try {
@@ -266,15 +278,35 @@
                 if (doc.exists()) {
                     applySettings(doc.data());
                 } else {
-                    applySettings({ wallpaperUrl: wallpapers[0].url, welcomeMessage: "Welcome! Click the 'Personalize' icon to change this text and the wallpaper." });
+                    applySettings({ wallpaperUrl: wallpapers[0].url, welcomeMessage: "Welcome! Double-click the 'Personalize' icon to change this text and the wallpaper." });
                 }
             });
         }
         
+        function openPersonalizeModal() {
+            welcomeMessageInput.value = currentSettings.welcomeMessage || '';
+            selectedWallpaperUrlForSave = currentSettings.wallpaperUrl || '';
+            
+            wallpaperOptionsContainer.innerHTML = ''; // Clear previous options
+            wallpapers.forEach(wp => {
+                const option = document.createElement('img');
+                option.src = wp.thumb;
+                option.className = 'wallpaper-option w-full h-20 object-cover rounded';
+                if (wp.url === currentSettings.wallpaperUrl) {
+                    option.classList.add('selected');
+                }
+                option.onclick = () => {
+                    document.querySelectorAll('.wallpaper-option').forEach(el => el.classList.remove('selected'));
+                    option.classList.add('selected');
+                    selectedWallpaperUrlForSave = wp.url;
+                };
+                wallpaperOptionsContainer.appendChild(option);
+            });
+        }
+
         async function saveSettings() {
-            const selectedWallpaper = document.querySelector('.wallpaper-option.selected'); 
             const newSettings = { 
-                wallpaperUrl: selectedWallpaper ? selectedWallpaper.dataset.url : currentSettings.wallpaperUrl, 
+                wallpaperUrl: selectedWallpaperUrlForSave, 
                 welcomeMessage: welcomeMessageInput.value || currentSettings.welcomeMessage, 
             }; 
             const db = getFirestore(); 
@@ -288,19 +320,6 @@
             }
         }
         
-        // Populate Personalize modal options
-        wallpapers.forEach(wp => {
-            const option = document.createElement('img');
-            option.src = wp.thumb;
-            option.dataset.url = wp.url;
-            option.className = 'wallpaper-option w-full h-20 object-cover rounded';
-            option.onclick = () => {
-                document.querySelectorAll('.wallpaper-option').forEach(el => el.classList.remove('selected'));
-                option.classList.add('selected');
-            };
-            wallpaperOptionsContainer.appendChild(option);
-        });
-
         saveSettingsBtn.addEventListener('click', saveSettings);
         
         // --- Screenshot Viewer ---
@@ -332,67 +351,7 @@
 
         // --- Mod List Generation ---
         const mods = [
-            { name: "AI-Improvements", author: "BuiltBrokenModding", url: "https://modrinth.com/mod/DSVgwcji" },
-            { name: "AppleSkin", author: "squeek", url: "https://modrinth.com/mod/EsAfCjCV" },
-            { name: "AsyncParticles", author: "Harvey_Husky", url: "https://modrinth.com/mod/c3onkd5k" },
-            { name: "Athena", author: "ThatGravyBoat", url: "https://modrinth.com/mod/b1ZV3DIJ" },
-            { name: "BadOptimizations", author: "Thosea", url: "https://modrinth.com/mod/g96Z4WVZ" },
-            { name: "BetterF3", author: "TreyRuffy, cominixo", url: "https://modrinth.com/mod/8shC1gFX" },
-            { name: "Catalogue", author: "MrCrayfish", url: "https://www.curseforge.com/minecraft/mc-mods/catalogue" },
-            { name: "Cerulean", author: "Toni, Mephodio", url: "https://modrinth.com/mod/dv57xmf9" },
-            { name: "Chipped", author: "Alex Nijjar, Grimbop, Kekie6, ThatGravyBoat", url: "https://modrinth.com/mod/BAscRYKm" },
-            { name: "Chunky", author: "pop4959", url: "https://modrinth.com/mod/fALzjamp" },
-            { name: "Cloth Config v15 API", author: "shedaniel", url: "https://modrinth.com/mod/9s6osm5g" },
-            { name: "Colorwheel", author: "djefrey", url: "https://modrinth.com/mod/BzHgFoGz" },
-            { name: "Colorwheel Patcher", author: "djefrey", url: "https://modrinth.com/mod/KPsw5jDu" },
-            { name: "Concurrent Chunk Management Engine", author: "RelativityMC, ishland", url: "https://modrinth.com/mod/COlSi5iR" },
-            { name: "Configured", author: "MrCrayfish", url: "https://www.curseforge.com/minecraft/mc-mods/configured" },
-            { name: "Cool Rain", author: "Jaiz", url: "https://modrinth.com/mod/iDyqnQLT" },
-            { name: "Create", author: "simibubi", url: "https://modrinth.com/mod/LNytGWDc" },
-            { name: "Create: Smart Bounds", author: "LiukRast", url: "https://modrinth.com/mod/kSok4DxT" },
-            { name: "Cristel Lib", author: "Cristelknight", url: "https://modrinth.com/mod/cl223EMc" },
-            { name: "Dungeons and Taverns Suite", author: "Nova_Wostra", url: "https://www.curseforge.com/minecraft/mc-mods/dungeons-and-taverns" },
-            { name: "EntityCulling", author: "tr7zw", url: "https://modrinth.com/mod/NNAgCjsB" },
-            { name: "Expanded Ecosphere", author: "William Wythers, Cristelknight999", url: "https://modrinth.com/mod/O1XGs7ps" },
-            { name: "Farmer's Delight", author: "vectorwing", url: "https://modrinth.com/mod/R2OftAxM" },
-            { name: "FastBoot", author: "dnlayu", url: "https://modrinth.com/mod/nRL5uFe0" },
-            { name: "Ferrite Core", author: "malte0811", url: "https://modrinth.com/mod/uXXizFIs" },
-            { name: "Fzzy Config", author: "fzzyhmstrs", url: "https://modrinth.com/mod/hYykXjDp" },
-            { name: "Handcrafted", author: "Alex Nijjar, Kekie6", url: "https://modrinth.com/mod/pJmCFF0p" },
-            { name: "ImmediatelyFast", author: "RK_01", url: "https://modrinth.com/mod/5ZwdcRci" },
-            { name: "Immersive Aircraft", author: "Luke100000", url: "https://modrinth.com/mod/x3HZvrj6" },
-            { name: "Immersive Armors", author: "Luke100000", url: "https://modrinth.com/mod/eE2Db4YU" },
-            { name: "Immersive Furniture", author: "Luke100000", url: "https://modrinth.com/mod/SvN6UGeF" },
-            { name: "Immersive Machinery", author: "Luke100000", url: "https://modrinth.com/mod/kGP3J2TW" },
-            { name: "Immersive Melodies", author: "Luke100000", url: "https://modrinth.com/mod/TaSmHw8V" },
-            { name: "Immersive Paintings", author: "Luke100000", url: "https://modrinth.com/mod/6txNkua3" },
-            { name: "Iris", author: "coderbot, IMS212", url: "https://modrinth.com/mod/YL57xq9U" },
-            { name: "Jade", author: "Snownee", url: "https://modrinth.com/mod/nvQzSEkH" },
-            { name: "Jade Addons", author: "Snownee", url: "https://modrinth.com/mod/xuDOzCLy" },
-            { name: "Kotlin for Forge", author: "thedarkcolour", url: "https://modrinth.com/mod/ordsPcFz" },
-            { name: "Lithium", author: "2No2Name, JellySquid", url: "https://modrinth.com/mod/gvQqBUqZ" },
-            { name: "M.R.U", author: "IMB11 (mineblock11)", url: "https://modrinth.com/mod/SNVQ2c0g" },
-            { name: "Model Gap Fix", author: "MehVahdJukaar", url: "https://modrinth.com/mod/QdG47OkI" },
-            { name: "ModernFix", author: "embeddedt", url: "https://modrinth.com/mod/nmDcB62a" },
-            { name: "More Culling", author: "FX - PR0CESS, 1Foxy2", url: "https://modrinth.com/mod/51shyZVL" },
-            { name: "Mouse Tweaks", author: "Ivan Molodetskikh (YaLTeR)", url: "https://modrinth.com/mod/aC3cM3Vq" },
-            { name: "Noisium", author: "Steveplays28", url: "https://modrinth.com/mod/KuNKN7d2" },
-            { name: "Particle Rain", author: "PigCart", url: "https://modrinth.com/mod/nrikgvxm" },
-            { name: "Polytone", author: "MehVahdJukaar", url: "https://modrinth.com/mod/3qAYkBMB" },
-            { name: "Redirected", author: "Toni", url: "https://modrinth.com/mod/hhnR8xqU" },
-            { name: "Reese's Sodium Options", author: "FlashyReese", url: "https://modrinth.com/mod/Bh37bMuy" },
-            { name: "Resourceful Lib", author: "ThatGravyBoat, Epic_Oreo", url: "https://modrinth.com/mod/G1hIVOrD" },
-            { name: "Resourcify", author: "DeDiamondPro", url: "https://modrinth.com/mod/RLzHAoZe" },
-            { name: "ScalableLux", author: "Spottedleaf, ishland", url: "https://modrinth.com/mod/Ps1zyz6x" },
-            { name: "ServerCore", author: "Wesley1808", url: "https://modrinth.com/mod/4WWQxlQP" },
-            { name: "Sodium", author: "JellySquid, IMS212", url: "https://modrinth.com/mod/AANobbMI" },
-            { name: "Sodium Extra", author: "FlashyReese", url: "https://modrinth.com/mod/PtjYWJkn" },
-            { name: "Sophisticated Backpacks", author: "P3pp3rF1y, Ridanisaurus", url: "https://modrinth.com/mod/TyCTlI4b" },
-            { name: "Sophisticated Core", author: "P3pp3rF1y", url: "https://modrinth.com/mod/nmoqTijg" },
-            { name: "Sophisticated Storage", author: "P3pp3rF1y, Ridanisaurus", url: "https://modrinth.com/mod/hMlaZH8f" },
-            { name: "Sounds", author: "IMB11", url: "https://modrinth.com/mod/ZouiUX7t" },
-            { name: "TxniLib", author: "Toni", url: "https://modrinth.com/mod/vBbPDuOs" },
-            { name: "YetAnotherConfigLib", author: "isXander", url: "https://modrinth.com/mod/1eAoo2KR" }
+            { name: "AI-Improvements", author: "BuiltBrokenModding", url: "https://modrinth.com/mod/DSVgwcji" }, { name: "AppleSkin", author: "squeek", url: "https://modrinth.com/mod/EsAfCjCV" }, { name: "AsyncParticles", author: "Harvey_Husky", url: "https://modrinth.com/mod/c3onkd5k" }, { name: "Athena", author: "ThatGravyBoat", url: "https://modrinth.com/mod/b1ZV3DIJ" }, { name: "BadOptimizations", author: "Thosea", url: "https://modrinth.com/mod/g96Z4WVZ" }, { name: "BetterF3", author: "TreyRuffy, cominixo", url: "https://modrinth.com/mod/8shC1gFX" }, { name: "Catalogue", author: "MrCrayfish", url: "https://www.curseforge.com/minecraft/mc-mods/catalogue" }, { name: "Cerulean", author: "Toni, Mephodio", url: "https://modrinth.com/mod/dv57xmf9" }, { name: "Chipped", author: "Alex Nijjar, Grimbop, Kekie6, ThatGravyBoat", url: "https://modrinth.com/mod/BAscRYKm" }, { name: "Chunky", author: "pop4959", url: "https://modrinth.com/mod/fALzjamp" }, { name: "Cloth Config v15 API", author: "shedaniel", url: "https://modrinth.com/mod/9s6osm5g" }, { name: "Colorwheel", author: "djefrey", url: "https://modrinth.com/mod/BzHgFoGz" }, { name: "Colorwheel Patcher", author: "djefrey", url: "https://modrinth.com/mod/KPsw5jDu" }, { name: "Concurrent Chunk Management Engine", author: "RelativityMC, ishland", url: "https://modrinth.com/mod/COlSi5iR" }, { name: "Configured", author: "MrCrayfish", url: "https://www.curseforge.com/minecraft/mc-mods/configured" }, { name: "Cool Rain", author: "Jaiz", url: "https://modrinth.com/mod/iDyqnQLT" }, { name: "Create", author: "simibubi", url: "https://modrinth.com/mod/LNytGWDc" }, { name: "Create: Smart Bounds", author: "LiukRast", url: "https://modrinth.com/mod/kSok4DxT" }, { name: "Cristel Lib", author: "Cristelknight", url: "https://modrinth.com/mod/cl223EMc" }, { name: "Dungeons and Taverns Suite", author: "Nova_Wostra", url: "https://www.curseforge.com/minecraft/mc-mods/dungeons-and-taverns" }, { name: "EntityCulling", author: "tr7zw", url: "https://modrinth.com/mod/NNAgCjsB" }, { name: "Expanded Ecosphere", author: "William Wythers, Cristelknight999", url: "https://modrinth.com/mod/O1XGs7ps" }, { name: "Farmer's Delight", author: "vectorwing", url: "https://modrinth.com/mod/R2OftAxM" }, { name: "FastBoot", author: "dnlayu", url: "https://modrinth.com/mod/nRL5uFe0" }, { name: "Ferrite Core", author: "malte0811", url: "https://modrinth.com/mod/uXXizFIs" }, { name: "Fzzy Config", author: "fzzyhmstrs", url: "https://modrinth.com/mod/hYykXjDp" }, { name: "Handcrafted", author: "Alex Nijjar, Kekie6", url: "https://modrinth.com/mod/pJmCFF0p" }, { name: "ImmediatelyFast", author: "RK_01", url: "https://modrinth.com/mod/5ZwdcRci" }, { name: "Immersive Aircraft", author: "Luke100000", url: "https://modrinth.com/mod/x3HZvrj6" }, { name: "Immersive Armors", author: "Luke100000", url: "https://modrinth.com/mod/eE2Db4YU" }, { name: "Immersive Furniture", author: "Luke100000", url: "https://modrinth.com/mod/SvN6UGeF" }, { name: "Immersive Machinery", author: "Luke100000", url: "https://modrinth.com/mod/kGP3J2TW" }, { name: "Immersive Melodies", author: "Luke100000", url: "https://modrinth.com/mod/TaSmHw8V" }, { name: "Immersive Paintings", author: "Luke100000", url: "https://modrinth.com/mod/6txNkua3" }, { name: "Iris", author: "coderbot, IMS212", url: "https://modrinth.com/mod/YL57xq9U" }, { name: "Jade", author: "Snownee", url: "https://modrinth.com/mod/nvQzSEkH" }, { name: "Jade Addons", author: "Snownee", url: "https://modrinth.com/mod/xuDOzCLy" }, { name: "Kotlin for Forge", author: "thedarkcolour", url: "https://modrinth.com/mod/ordsPcFz" }, { name: "Lithium", author: "2No2Name, JellySquid", url: "https://modrinth.com/mod/gvQqBUqZ" }, { name: "M.R.U", author: "IMB11 (mineblock11)", url: "https://modrinth.com/mod/SNVQ2c0g" }, { name: "Model Gap Fix", author: "MehVahdJukaar", url: "https://modrinth.com/mod/QdG47OkI" }, { name: "ModernFix", author: "embeddedt", url: "https://modrinth.com/mod/nmDcB62a" }, { name: "More Culling", author: "FX - PR0CESS, 1Foxy2", url: "https://modrinth.com/mod/51shyZVL" }, { name: "Mouse Tweaks", author: "Ivan Molodetskikh (YaLTeR)", url: "https://modrinth.com/mod/aC3cM3Vq" }, { name: "Noisium", author: "Steveplays28", url: "https://modrinth.com/mod/KuNKN7d2" }, { name: "Particle Rain", author: "PigCart", url: "https://modrinth.com/mod/nrikgvxm" }, { name: "Polytone", author: "MehVahdJukaar", url: "https://modrinth.com/mod/3qAYkBMB" }, { name: "Redirected", author: "Toni", url: "https://modrinth.com/mod/hhnR8xqU" }, { name: "Reese's Sodium Options", author: "FlashyReese", url: "https://modrinth.com/mod/Bh37bMuy" }, { name: "Resourceful Lib", author: "ThatGravyBoat, Epic_Oreo", url: "https://modrinth.com/mod/G1hIVOrD" }, { name: "Resourcify", author: "DeDiamondPro", url: "https://modrinth.com/mod/RLzHAoZe" }, { name: "ScalableLux", author: "Spottedleaf, ishland", url: "https://modrinth.com/mod/Ps1zyz6x" }, { name: "ServerCore", author: "Wesley1808", url: "https://modrinth.com/mod/4WWQxlQP" }, { name: "Sodium", author: "JellySquid, IMS212", url: "https://modrinth.com/mod/AANobbMI" }, { name: "Sodium Extra", author: "FlashyReese", url: "https://modrinth.com/mod/PtjYWJkn" }, { name: "Sophisticated Backpacks", author: "P3pp3rF1y, Ridanisaurus", url: "https://modrinth.com/mod/TyCTlI4b" }, { name: "Sophisticated Core", author: "P3pp3rF1y", url: "https://modrinth.com/mod/nmoqTijg" }, { name: "Sophisticated Storage", author: "P3pp3rF1y, Ridanisaurus", url: "https://modrinth.com/mod/hMlaZH8f" }, { name: "Sounds", author: "IMB11", url: "https://modrinth.com/mod/ZouiUX7t" }, { name: "TxniLib", author: "Toni", url: "https://modrinth.com/mod/vBbPDuOs" }, { name: "YetAnotherConfigLib", author: "isXander", url: "https://modrinth.com/mod/1eAoo2KR" }
         ];
         const modListContainer = document.getElementById('mod-list-container');
         mods.sort((a,b)=>a.name.localeCompare(b.name)).forEach(mod => {
