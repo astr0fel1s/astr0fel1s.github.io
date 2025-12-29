@@ -3,364 +3,257 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ruben Cej - Portfolio</title>
-    
-    <!-- Carichiamo un font monospazio carino (Fira Code) -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
-    
-    <!-- Non usiamo Tailwind qui, la stilizzazione è molto specifica -->
+    <title>Curriculum Vitae - Ruben Giordano Cej</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --bg-color: #1e1e2e;      /* Sfondo (Catppuccin Mocha Base) */
-            --fg-color: #cdd6f4;      /* Testo (Catppuccin Mocha Text) */
-            --prompt-color: #a6e3a1;  /* Verde (Prompt) */
-            --link-color: #89b4fa;      /* Blu (Link) */
-            --error-color: #f38ba8;     /* Rosso (Errori) */
-            --welcome-color: #cba6f7; /* Viola (Benvenuto) */
-            --border-color: #b4f9f8;  /* Ciano (Focus) */
-        }
-
-        html, body {
-            height: 100%;
-            margin: 0;
-            padding: 0;
-        }
-
         body {
-            background-color: var(--bg-color);
-            color: var(--fg-color);
-            font-family: 'Fira Code', 'Courier New', monospace;
-            font-size: 16px;
-            line-height: 1.5;
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
         }
-
-        /* Contenitore principale del terminale */
-        .terminal-window {
-            width: 100%;
-            height: 100%;
-            overflow-y: auto;
-            box-sizing: border-box; /* Per padding corretto */
-            padding: 20px;
-            cursor: text; /* Cursore a testo ovunque */
+        .section-title {
+            position: relative;
+            display: inline-block;
         }
-
-        /* Area dove vengono stampati i risultati */
-        #output {
-            white-space: pre-wrap; /* Mantiene a-capo e spazi */
-        }
-
-        /* La riga di input corrente */
-        .command-line {
-            display: flex;
-        }
-
-        /* Il prompt (es. 'ruben@portfolio:~$') */
-        .prompt {
-            color: var(--prompt-color);
-            white-space: nowrap; /* Non va a capo */
-            margin-right: 8px;
-        }
-
-        /* L'input utente vero e proprio */
-        #input {
-            background: transparent;
-            border: none;
-            outline: none;
-            color: var(--fg-color);
-            font: inherit; /* Stessa font del body */
-            flex-grow: 1; /* Occupa lo spazio rimanente */
-            caret-color: var(--fg-color); /* Cursore lampeggiante */
-            padding: 0;
-        }
-        
-        /* Stile per i comandi già eseguiti */
-        .executed-command .prompt {
-            color: var(--prompt-color);
-        }
-        
-        .executed-command .user-input {
-            color: var(--fg-color);
-        }
-
-        /* Stili per output specifici */
-        .output-line a {
-            color: var(--link-color);
-            text-decoration: underline;
-        }
-
-        .output-error {
-            color: var(--error-color);
-        }
-        
-        .output-welcome {
-            color: var(--welcome-color);
-        }
-
-        /* Nasconde il cursore finto quando l'input non è focus */
-        #input:not(:focus) + .fake-cursor {
-            display: none;
+        .section-title::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            bottom: -4px;
+            width: 40px;
+            height: 3px;
+            background-color: #3b82f6; /* Blue-500 */
+            border-radius: 2px;
         }
     </style>
 </head>
-<body>
+<body class="text-slate-700 antialiased py-10 px-4 sm:px-6 lg:px-8 print:p-0 print:bg-white">
 
-    <div class="terminal-window" id="terminal">
-        <!-- L'output dei comandi verrà inserito qui da JavaScript -->
-        <div id="output"></div>
-        
-        <!-- La riga di input attiva -->
-        <div class="command-line" id="input-line">
-            <span class="prompt">ruben@portfolio:~$</span>
-            <input type="text" id="input" autofocus autocomplete="off" autocorrect="off" autocapitalize="none" spellcheck="false">
+    <!-- Main Container -->
+    <main class="max-w-5xl mx-auto bg-white shadow-xl rounded-2xl overflow-hidden print:shadow-none print:rounded-none">
+
+        <!-- Header / Banner -->
+        <header class="bg-slate-900 text-white p-8 md:p-12">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+                <div>
+                    <h1 class="text-4xl md:text-5xl font-bold tracking-tight mb-2">Ruben Giordano Cej</h1>
+                    <p class="text-slate-300 text-lg font-medium">Appassionato di Informatica & Linux</p>
+                </div>
+
+                <!-- Contact Info Grid -->
+                <div class="grid grid-cols-1 gap-3 text-slate-300 text-sm md:text-right">
+                    <a href="mailto:kaedekita@proton.me" class="flex items-center gap-2 md:flex-row-reverse hover:text-white transition-colors">
+                        <i data-lucide="mail" class="w-4 h-4"></i>
+                        <span>kaedekita@proton.me</span>
+                    </a>
+                    <a href="tel:+393757940404" class="flex items-center gap-2 md:flex-row-reverse hover:text-white transition-colors">
+                        <i data-lucide="phone" class="w-4 h-4"></i>
+                        <span>+39 375 794 0404</span>
+                    </a>
+                    <div class="flex items-center gap-2 md:flex-row-reverse">
+                        <i data-lucide="map-pin" class="w-4 h-4"></i>
+                        <span>Gorizia, 34170</span>
+                    </div>
+                    <div class="flex items-center gap-2 md:flex-row-reverse">
+                        <i data-lucide="calendar" class="w-4 h-4"></i>
+                        <span>Nato il 08/09/2006</span>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Content Body -->
+        <div class="flex flex-col md:flex-row">
+
+            <!-- Left Sidebar (Skills, Languages, etc.) -->
+            <aside class="w-full md:w-1/3 bg-slate-50 p-8 border-r border-slate-100 print:bg-white print:border-none">
+
+                <!-- Skills Section -->
+                <div class="mb-10">
+                    <h3 class="text-slate-900 font-bold uppercase tracking-wider text-sm mb-4 flex items-center gap-2">
+                        <i data-lucide="wrench" class="w-4 h-4 text-blue-600"></i> Competenze
+                    </h3>
+                    <div class="flex flex-wrap gap-2">
+                        <span class="bg-white border border-slate-200 px-3 py-1 rounded-full text-xs font-semibold text-slate-700 shadow-sm">Linux (Arch-based)</span>
+                        <span class="bg-white border border-slate-200 px-3 py-1 rounded-full text-xs font-semibold text-slate-700 shadow-sm">Hardware</span>
+                        <span class="bg-white border border-slate-200 px-3 py-1 rounded-full text-xs font-semibold text-slate-700 shadow-sm">Thermal Management</span>
+                        <span class="bg-white border border-slate-200 px-3 py-1 rounded-full text-xs font-semibold text-slate-700 shadow-sm">System Tuning</span>
+                        <span class="bg-white border border-slate-200 px-3 py-1 rounded-full text-xs font-semibold text-slate-700 shadow-sm">Troubleshooting</span>
+                        <span class="bg-white border border-slate-200 px-3 py-1 rounded-full text-xs font-semibold text-slate-700 shadow-sm">CLI & Terminale</span>
+                    </div>
+                </div>
+
+                <!-- Soft Skills -->
+                <div class="mb-10">
+                    <h3 class="text-slate-900 font-bold uppercase tracking-wider text-sm mb-4 flex items-center gap-2">
+                        <i data-lucide="user" class="w-4 h-4 text-blue-600"></i> Soft Skills
+                    </h3>
+                    <ul class="space-y-2 text-sm text-slate-600">
+                        <li class="flex items-center gap-2"><div class="w-1.5 h-1.5 rounded-full bg-blue-500"></div> Precisione tecnica</li>
+                        <li class="flex items-center gap-2"><div class="w-1.5 h-1.5 rounded-full bg-blue-500"></div> Problem Solving</li>
+                        <li class="flex items-center gap-2"><div class="w-1.5 h-1.5 rounded-full bg-blue-500"></div> Adattabilità</li>
+                        <li class="flex items-center gap-2"><div class="w-1.5 h-1.5 rounded-full bg-blue-500"></div> Autoformazione</li>
+                    </ul>
+                </div>
+
+                <!-- Languages -->
+                <div class="mb-10">
+                    <h3 class="text-slate-900 font-bold uppercase tracking-wider text-sm mb-4 flex items-center gap-2">
+                        <i data-lucide="languages" class="w-4 h-4 text-blue-600"></i> Lingue
+                    </h3>
+                    <div class="space-y-4">
+                        <div>
+                            <div class="flex justify-between text-sm mb-1">
+                                <span class="font-medium text-slate-700">Sloveno</span>
+                                <span class="text-slate-500 text-xs">Madrelingua</span>
+                            </div>
+                            <div class="w-full bg-slate-200 rounded-full h-1.5">
+                                <div class="bg-blue-600 h-1.5 rounded-full" style="width: 100%"></div>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="flex justify-between text-sm mb-1">
+                                <span class="font-medium text-slate-700">Italiano</span>
+                                <span class="text-slate-500 text-xs">Madrelingua</span>
+                            </div>
+                            <div class="w-full bg-slate-200 rounded-full h-1.5">
+                                <div class="bg-blue-600 h-1.5 rounded-full" style="width: 100%"></div>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="flex justify-between text-sm mb-1">
+                                <span class="font-medium text-slate-700">Inglese</span>
+                                <span class="text-slate-500 text-xs">Avanzato (C1)</span>
+                            </div>
+                            <div class="w-full bg-slate-200 rounded-full h-1.5">
+                                <div class="bg-blue-600 h-1.5 rounded-full" style="width: 85%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Hobbies -->
+                <div>
+                    <h3 class="text-slate-900 font-bold uppercase tracking-wider text-sm mb-4 flex items-center gap-2">
+                        <i data-lucide="camera" class="w-4 h-4 text-blue-600"></i> Interessi
+                    </h3>
+                    <ul class="text-sm text-slate-600 space-y-2">
+                        <li>Fotografia</li>
+                        <li>Elettronica</li>
+                        <li>Ambito Audio/Video</li>
+                    </ul>
+                </div>
+
+            </aside>
+
+            <!-- Main Content (Profile, Details, Education) -->
+            <div class="w-full md:w-2/3 p-8 md:p-12">
+
+                <!-- Profile Section -->
+                <section class="mb-10">
+                    <h2 class="text-2xl font-bold text-slate-900 mb-4 section-title">Profilo Professionale</h2>
+                    <p class="text-slate-600 leading-relaxed">
+                        Appassionato di informatica con forte attitudine pratica e ottima manualità hardware. Utente esperto di ambienti Linux (Arch-based) per uso desktop e gaming, con competenze specifiche nel system tuning e nella manutenzione hardware. Cerco un'opportunità di lavoro (anche come Apprendista) dove poter applicare la mia precisione tecnica e imparare nuove procedure professionali.
+                    </p>
+                </section>
+
+                <!-- Technical Expertise Section -->
+                <section class="mb-10">
+                    <h2 class="text-2xl font-bold text-slate-900 mb-6 section-title">Competenze Tecniche</h2>
+                    <div class="space-y-6">
+
+                        <div class="flex gap-4 items-start">
+                            <div class="mt-1 p-2 bg-blue-50 text-blue-600 rounded-lg">
+                                <i data-lucide="terminal" class="w-5 h-5"></i>
+                            </div>
+                            <div>
+                                <h3 class="font-bold text-slate-800 text-lg">Gestione Ambiente Linux</h3>
+                                <p class="text-slate-600 text-sm leading-relaxed mt-1">
+                                    Installazione e configurazione di distribuzioni (Arch, CachyOS). Buona familiarità con il Terminale (CLI) per gestione pacchetti, aggiornamenti e navigazione file system.
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="flex gap-4 items-start">
+                            <div class="mt-1 p-2 bg-blue-50 text-blue-600 rounded-lg">
+                                <i data-lucide="cpu" class="w-5 h-5"></i>
+                            </div>
+                            <div>
+                                <h3 class="font-bold text-slate-800 text-lg">Hardware & Thermal Management</h3>
+                                <p class="text-slate-600 text-sm leading-relaxed mt-1">
+                                    Assemblaggio PC Desktop e manutenzione Laptop. Esperienza specifica nell'applicazione di materiali termici avanzati (PTM7950, Thermal Putty) per abbattere le temperature e migliorare le prestazioni.
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="flex gap-4 items-start">
+                            <div class="mt-1 p-2 bg-blue-50 text-blue-600 rounded-lg">
+                                <i data-lucide="settings" class="w-5 h-5"></i>
+                            </div>
+                            <div>
+                                <h3 class="font-bold text-slate-800 text-lg">Ottimizzazione Sistema</h3>
+                                <p class="text-slate-600 text-sm leading-relaxed mt-1">
+                                    Configurazione pratica di parametri (es. ZRAM, processi di avvio) per migliorare la reattività del computer.
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="flex gap-4 items-start">
+                            <div class="mt-1 p-2 bg-blue-50 text-blue-600 rounded-lg">
+                                <i data-lucide="search-check" class="w-5 h-5"></i>
+                            </div>
+                            <div>
+                                <h3 class="font-bold text-slate-800 text-lg">Troubleshooting</h3>
+                                <p class="text-slate-600 text-sm leading-relaxed mt-1">
+                                    Capacità di identificare la causa dei guasti analizzando i messaggi di errore. Utilizzo efficace di documentazione online (Wiki) e strumenti AI per trovare la sintassi corretta e la procedura di fix necessaria.
+                                </p>
+                            </div>
+                        </div>
+
+                    </div>
+                </section>
+
+                <!-- Education Section -->
+                <section class="mb-8">
+                    <h2 class="text-2xl font-bold text-slate-900 mb-6 section-title">Istruzione e Formazione</h2>
+
+                    <div class="relative border-l border-slate-200 ml-3 space-y-8">
+
+                        <!-- Education Item 1 -->
+                        <div class="ml-6 relative">
+                            <span class="absolute -left-[31px] top-1 w-4 h-4 rounded-full border-2 border-white bg-blue-500 shadow-sm"></span>
+                            <h3 class="text-lg font-bold text-slate-800">Autoformazione Tecnica</h3>
+                            <p class="text-sm font-semibold text-blue-600 mb-1">Linux Desktop, Hardware, Ottimizzazione</p>
+                            <p class="text-slate-600 text-sm">Focus su: Linux Desktop/Server, Assemblaggio/Manutenzione Hardware, Ottimizzazione Software/OS.</p>
+                        </div>
+
+                        <!-- Education Item 2 -->
+                        <div class="ml-6 relative">
+                            <span class="absolute -left-[31px] top-1 w-4 h-4 rounded-full border-2 border-white bg-slate-300"></span>
+                            <h3 class="text-lg font-bold text-slate-800">Scuola Secondaria di Primo Grado "Ivan Trinko"</h3>
+                            <p class="text-sm font-semibold text-blue-600 mb-1">Gorizia</p>
+                            <p class="text-slate-600 text-sm">Licenza Media Istruzione di Base.</p>
+                        </div>
+
+                    </div>
+                </section>
+
+            </div>
         </div>
-    </div>
+
+        <!-- Footer -->
+        <footer class="bg-slate-50 border-t border-slate-100 p-6 text-center">
+            <p class="text-xs text-slate-400 max-w-2xl mx-auto leading-relaxed">
+                Autorizzo il trattamento dei miei dati personali ai sensi dell'art. 13 del D. Lgs. 196/2003 e dell'art. 13 GDPR (Regolamento UE 2016/679) ai fini della ricerca e selezione del personale.
+            </p>
+        </footer>
+
+    </main>
 
     <script>
-        // Elementi DOM
-        const terminal = document.getElementById('terminal');
-        const output = document.getElementById('output');
-        const inputLine = document.getElementById('input-line');
-        const input = document.getElementById('input');
-
-        // Cronologia comandi per frecce Su/Giù
-        let commandHistory = [];
-        let historyIndex = -1;
-
-        // Dati del portfolio
-        const portfolioData = {
-            bio: `Appassionato di informatica di 19 anni con una solida competenza pratica, sviluppata da autodidatta, nella gestione di sistemi operativi Linux (inclusa configurazione e uso avanzato della riga di comando).
-Conoscenza informatica di base e familiarità con il linguaggio Lua.
-Attualmente sto ampliando le mie competenze attraverso lo studio di Java e C.
-Determinato e motivato, cerco un'opportunità di livello entry-level (come apprendistato o stage) per applicare le mie abilità tecniche e imparare sul campo.`,
-            
-            competenze: `
-Sistemi Operativi:
-  - Ottima conoscenza di SO Linux (gestione da riga di comando, configurazione di base).
-  - Buona conoscenza di Windows.
-
-Programmazione:
-  - Esperienza di base con il linguaggio Lua.
-  - Studio in corso di Java e C.
-
-Software:
-  - Conoscenza di base del pacchetto Microsoft Office.
-
-Conoscenze Generali:
-  - Informatica di base (Hardware, Software, Reti).
-`,
-            contatti: `
-Email:     <a href="mailto:kaedekita@proton.me">kaedekita@proton.me</a>
-GitHub:    <a href="https://github.com/astr0fel1s" target="_blank">github.com/astr0fel1s</a>
-Curriculum: Puoi richiedermi il mio CV aggiornato via email.
-`,
-            progetti: `
-Al momento, i miei progetti principali sono legati allo studio e alla configurazione dei miei sistemi.
-
-1. Dotfiles (Configurazioni Linux):
-   - Un repository contenente le mie configurazioni personalizzate per .bashrc, Neovim, e altri tool.
-   - Stato: In corso.
-
-2. Script di Automazione (Bash):
-   - Piccoli script per automatizzare task di manutenzione sul mio server.
-   - Stato: Disponibili su richiesta.
-
-(Puoi vedere i miei progetti futuri sul mio profilo GitHub)
-`
-        };
-
-        // Definizione dei comandi disponibili
-        const commands = {
-            'help': () => {
-                return `
-Comandi disponibili:
-  <span class="output-welcome">help</span>        Mostra questa lista di comandi.
-  <span class="output-welcome">chi_sono</span>    Mostra una breve biografia.
-  <span class="output-welcome">competenze</span>  Elenca le mie competenze tecniche.
-  <span class="output-welcome">progetti</span>    Mostra i progetti a cui sto lavorando.
-  <span class="output-welcome">contatti</span>    Mostra come contattarmi.
-  <span class="output-welcome">cv</span>          Vedi 'contatti'.
-  <span class="output-welcome">clear</span>       Pulisce lo schermo del terminale.
-  <span class="output-welcome">benvenuto</span>   Mostra il messaggio di benvenuto.
-`;
-            },
-            'chi_sono': () => portfolioData.bio,
-            'bio': () => portfolioData.bio, // Alias
-            'whoami': () => portfolioData.bio, // Alias
-            'competenze': () => portfolioData.competenze,
-            'skills': () => portfolioData.competenze, // Alias
-            'progetti': () => portfolioData.progetti,
-            'projects': () => portfolioData.progetti, // Alias
-            'contatti': () => portfolioData.contatti,
-            'contacts': () => portfolioData.contatti, // Alias
-            'cv': () => `Vedi la sezione 'contatti' per richiedere il mio CV.`,
-            'clear': () => {
-                output.innerHTML = '';
-                return ''; // Non stampa nulla
-            },
-            'benvenuto': () => {
-                return `
-<span class="output-welcome">
- ░▒▓██████▓▒░░▒▓█▓▒░░▒▓█▓▒░▒▓███████▓▒░░▒▓███████▓▒░░▒▓█▓▒░░▒▓██████▓▒░░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░     ░▒▓█▓▒░░▒▓█▓▒░▒▓██████████████▓▒░       ░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░▒▓████████▓▒░▒▓██████▓▒░░▒▓████████▓▒░ 
-░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░     ░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░░▒▓█▓▒░      ░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░  ░▒▓█▓▒░  ░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░        
-░▒▓█▓▒░      ░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░▒▓█▓▒░      ░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░     ░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░░▒▓█▓▒░       ░▒▓█▓▒▒▓█▓▒░░▒▓█▓▒░  ░▒▓█▓▒░  ░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░        
-░▒▓█▓▒░      ░▒▓█▓▒░░▒▓█▓▒░▒▓███████▓▒░░▒▓███████▓▒░░▒▓█▓▒░▒▓█▓▒░      ░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░     ░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░░▒▓█▓▒░       ░▒▓█▓▒▒▓█▓▒░░▒▓█▓▒░  ░▒▓█▓▒░  ░▒▓████████▓▒░▒▓██████▓▒░   
-░▒▓█▓▒░      ░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░▒▓█▓▒░      ░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░     ░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░░▒▓█▓▒░        ░▒▓█▓▓█▓▒░ ░▒▓█▓▒░  ░▒▓█▓▒░  ░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░        
-░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░     ░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░░▒▓█▓▒░        ░▒▓█▓▓█▓▒░ ░▒▓█▓▒░  ░▒▓█▓▒░  ░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░        
- ░▒▓██████▓▒░ ░▒▓██████▓▒░░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓██████▓▒░ ░▒▓██████▓▒░░▒▓████████▓▒░▒▓██████▓▒░░▒▓█▓▒░░▒▓█▓▒░░▒▓█▓▒░         ░▒▓██▓▒░  ░▒▓█▓▒░  ░▒▓█▓▒░  ░▒▓█▓▒░░▒▓█▓▒░▒▓████████▓▒░                                                                                                                                                                   
-</span>
-Benvenuto nel mio portfolio interattivo.
-Sono Ruben Cej, un appassionato di Linux e programmazione.
-
-Digita <span class="output-welcome">'help'</span> per vedere la lista dei comandi disponibili.
-`;
-            }
-        };
-        
-        // Elenco comandi per autocompletamento
-        const commandList = Object.keys(commands);
-
-        // --- FUNZIONI PRINCIPALI ---
-
-        /** Funzione chiamata quando l'utente preme Invio */
-        function processCommand() {
-            const commandText = input.value.trim();
-
-            // Clona la riga di input e la "stampa" nell'output
-            logExecutedCommand(commandText);
-
-            // Aggiungi alla cronologia solo se non è vuoto
-            if (commandText) {
-                commandHistory.unshift(commandText); // Aggiunge all'inizio
-                if (commandHistory.length > 50) commandHistory.pop(); // Limita la cronologia
-            }
-            historyIndex = -1; // Resetta l'indice della cronologia
-
-            // Pulisce l'input
-            input.value = '';
-
-            // Se il comando è vuoto, non fare nulla se non creare una nuova riga
-            if (!commandText) {
-                scrollToBottom();
-                return;
-            }
-
-            // Trova ed esegui il comando
-            const commandFunc = commands[commandText.toLowerCase()];
-            let commandOutput = '';
-
-            if (commandFunc) {
-                commandOutput = commandFunc();
-            } else {
-                commandOutput = `<span class="output-error">Comando non trovato: ${escapeHTML(commandText)}</span>
-Digita 'help' per la lista dei comandi.`;
-            }
-
-            // Stampa l'output del comando
-            if (commandOutput) {
-                printOutput(commandOutput);
-            }
-            
-            scrollToBottom();
-        }
-
-        /** Stampa una riga nell'area output */
-        function printOutput(htmlContent) {
-            const newLine = document.createElement('div');
-            newLine.classList.add('output-line');
-            newLine.innerHTML = htmlContent;
-            output.appendChild(newLine);
-        }
-
-        /** Stampa il comando che l'utente ha appena eseguito */
-        function logExecutedCommand(commandText) {
-            const executedLine = document.createElement('div');
-            executedLine.classList.add('executed-command');
-            
-            executedLine.innerHTML = `<span class="prompt">ruben@portfolio:~$</span><span class="user-input">${escapeHTML(commandText)}</span>`;
-            output.appendChild(executedLine);
-        }
-        
-        /** Gestisce la pressione dei tasti (Invio, Frecce, Tab) */
-        function handleKeydown(e) {
-            switch (e.key) {
-                case 'Enter':
-                    processCommand();
-                    break;
-                
-                case 'ArrowUp':
-                    e.preventDefault(); // Ferma il cursore dal muoversi
-                    if (historyIndex < commandHistory.length - 1) {
-                        historyIndex++;
-                        input.value = commandHistory[historyIndex];
-                        // Sposta il cursore alla fine
-                        input.selectionStart = input.selectionEnd = input.value.length;
-                    }
-                    break;
-                
-                case 'ArrowDown':
-                    e.preventDefault();
-                    if (historyIndex > 0) {
-                        historyIndex--;
-                        input.value = commandHistory[historyIndex];
-                    } else {
-                        // Siamo tornati all'inizio
-                        historyIndex = -1;
-                        input.value = '';
-                    }
-                    break;
-                
-                case 'Tab':
-                    e.preventDefault(); // Ferma il focus dal cambiare
-                    autocompleteCommand();
-                    break;
-            }
-        }
-        
-        /** Gestisce l'autocompletamento con Tab */
-        function autocompleteCommand() {
-            const currentInput = input.value.toLowerCase();
-            const suggestions = commandList.filter(cmd => cmd.startsWith(currentInput));
-            
-            if (suggestions.length === 1) {
-                // Trovata corrispondenza unica
-                input.value = suggestions[0];
-            } else if (suggestions.length > 1) {
-                // Trovate multiple, stampa suggerimenti
-                logExecutedCommand(input.value); // Stampa cosa ha scritto
-                printOutput(suggestions.join('    ')); // Stampa i suggerimenti
-                scrollToBottom();
-            }
-        }
-        
-        /** Manda la view a fondo pagina */
-        function scrollToBottom() {
-            terminal.scrollTop = terminal.scrollHeight;
-        }
-        
-        /** Utility per sanitizzare l'HTML */
-        function escapeHTML(str) {
-            return str.replace(/</g, "&lt;").replace(/>/g, "&gt;");
-        }
-
-        // --- EVENT LISTENERS ---
-
-        // Focus sull'input quando si clicca ovunque
-        terminal.addEventListener('click', () => {
-            input.focus();
-        });
-
-        // Gestisce la pressione dei tasti
-        input.addEventListener('keydown', handleKeydown);
-
-        // --- INIZIALIZZAZIONE ---
-        
-        // Stampa il messaggio di benvenuto all'avvio
-        printOutput(commands['benvenuto']());
-        scrollToBottom();
-
+        // Initialize Icons
+        lucide.createIcons();
     </script>
-
 </body>
 </html>
